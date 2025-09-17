@@ -1,0 +1,52 @@
+/* -------------------- */
+/* Styling umum untuk semua login */
+/* -------------------- */
+.card {
+     background-color: #0a1931 !important;
+     /* biru navy gelap */
+     color: white;
+ }
+
+ /* ubah kotak putih jadi tidak terlalu melengkung */
+ .form-control-user {
+     border-radius: 8px !important;/* lebih kotak */
+     
+ }
+
+ .judul-evisitor {
+     margin-top: -40px;/* atur sesuai selera */
+ }
+
+ .user { /* */
+     margin-top: -5px;/* atur sesuai selera */
+ }
+
+ .card {
+     border-radius: 20px !important;/* sudut agak lengkung */
+ }
+ 
+ .label {
+     color: white;/* sesuai kelas text-white-5 sebelumnya */
+     margin-top: 10px;/* jarak antar kotak putih */
+     margin-bottom: 5px;/* jarak antara teks dan input */
+     font-size: 14px; /* font username, pw, nama lengkap */
+ }
+
+ .foto-kiri {
+     width: 70px;
+     height: auto;
+     float: left; /* foto berada di kiri */
+     margin-right: 10px; /* jarak ke teks */
+     border-radius: 8px;
+     margin-top: -50px; /* ke atas */
+     justify-content: flex-start; /* foto di atas */
+    margin-left: -35px;/* geser ke kiri */
+ }
+
+.role-teks { /* admin / resepsionis */
+    margin-top: 10px;/* jarak kecil dari tombol login */
+    font-size: 14px;/* lebih kecil biar rapi */
+    color: #ccc;/* abu-abu muda supaya beda sama teks utama */
+}
+
+
