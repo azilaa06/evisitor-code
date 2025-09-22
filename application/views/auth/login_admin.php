@@ -31,7 +31,7 @@
 
 </head>
 
-<body style="bg-white-primary"> <!-- warna latar -->
+<body class="bg-white-primary"> <!-- warna latar -->
 
     <div class="container">
 
