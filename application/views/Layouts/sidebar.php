@@ -108,7 +108,39 @@
             transform: translateX(0);
         }
     }
+
+    /* Tombol Toggle */
+    #toggleSidebar {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1100;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 12px;
+        cursor: pointer;
+        display: none; /* default sembunyi */
+    }
+
+    /* Overlay */
+    #sidebarOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        z-index: 900;
+    }
 </style>
+
+<!-- Tombol Toggle Sidebar -->
+<button id="toggleSidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Overlay -->
+<div id="sidebarOverlay"></div>
 
 <!-- Sidebar Navigation -->
 <nav class="sidebar">
@@ -147,3 +179,32 @@
         </a>
     </div>
 </nav>
+
+<script>
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function checkScreen() {
+        if (window.innerWidth <= 768) {
+            toggleBtn.style.display = 'block';
+        } else {
+            toggleBtn.style.display = 'none';
+            sidebar.classList.remove('active');
+            overlay.style.display = 'none';
+        }
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.style.display = 'none';
+    });
+
+    window.addEventListener('resize', checkScreen);
+    window.addEventListener('load', checkScreen);
+</script>

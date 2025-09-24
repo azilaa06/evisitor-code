@@ -263,9 +263,10 @@
     <!-- Main Content -->
     <main class="main-content">
         <!-- Header -->
-        <div class="username">[username]</div>
-        <button class="settings-btn"><i class="fas fa-cog"></i></button>
-        
+        <div class="username">
+            <?= $nama ?: $username ?>
+        </div>
+
         <!-- Form Container -->
         <div class="form-container">
             <h2 class="form-title">
