@@ -56,6 +56,7 @@ class Auth extends CI_Controller {
         $this->load->view('auth/login_user');
     }
 
+
     // Dashboard admin
     public function dashboard_admin(){  // ambil nama dari session
         $data['nama'] = $this->session->userdata('nama_lengkap');
@@ -89,3 +90,6 @@ class Auth extends CI_Controller {
     }
 
 } // <-- pastikan class ditutup di sini
+
+}
+

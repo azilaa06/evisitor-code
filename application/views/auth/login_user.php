@@ -31,7 +31,7 @@
 
 </head>
 
-<body style="bg-white-primary"> <!-- warna latar -->
+<body class="bg-white-primary"> <!-- warna latar -->
 
     <div class="container">
 
@@ -66,6 +66,7 @@
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
                                             Login
                                         </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
