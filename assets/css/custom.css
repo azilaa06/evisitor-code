@@ -27,8 +27,8 @@
  
  .label {
      color: white;/* sesuai kelas text-white-5 sebelumnya */
-     margin-top: 10px;/* jarak antar kotak putih */
-     margin-bottom: 5px;/* jarak antara teks dan input */
+     margin-top: 5px;/* jarak antar kotak putih */
+     margin-bottom: 10px;/* jarak antara teks dan input */
      font-size: 14px; /* font username, pw, nama lengkap */
  }
 
@@ -48,5 +48,4 @@
     font-size: 14px;/* lebih kecil biar rapi */
     color: #ccc;/* abu-abu muda supaya beda sama teks utama */
 }
-
 

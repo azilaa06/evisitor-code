@@ -52,3 +52,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $route['default_controller'] = 'auth';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+/* Tambahan route custom */
+$route['dashboard_admin'] = 'auth/dashboard_admin';
+$route['manajemen_kunjungan'] = 'Manajemen_kunjungan/data';
+$route['profil'] = 'profil_admin/profil';
+$route['manajemen_kunjungan/(:any)'] = 'Manajemen_kunjungan/data/$1';
