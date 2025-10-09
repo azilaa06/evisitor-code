@@ -1,52 +1,174 @@
 /* -------------------- */
-/* Styling umum untuk semua login */
+/* E-Visitor Login Styling dengan Bootstrap */
 /* -------------------- */
-.card {
-     background-color: #0a1931 !important;
-     /* biru navy gelap */
-     color: white;
- }
 
- /* ubah kotak putih jadi tidak terlalu melengkung */
- .form-control-user {
-     border-radius: 8px !important;/* lebih kotak */
-     
- }
-
- .judul-evisitor {
-     margin-top: -40px;/* atur sesuai selera */
- }
-
- .user { /* */
-     margin-top: -5px;/* atur sesuai selera */
- }
-
- .card {
-     border-radius: 20px !important;/* sudut agak lengkung */
- }
- 
- .label {
-     color: white;/* sesuai kelas text-white-5 sebelumnya */
-     margin-top: 10px;/* jarak antar kotak putih */
-     margin-bottom: 5px;/* jarak antara teks dan input */
-     font-size: 14px; /* font username, pw, nama lengkap */
- }
-
- .foto-kiri {
-     width: 70px;
-     height: auto;
-     float: left; /* foto berada di kiri */
-     margin-right: 10px; /* jarak ke teks */
-     border-radius: 8px;
-     margin-top: -50px; /* ke atas */
-     justify-content: flex-start; /* foto di atas */
-    margin-left: -35px;/* geser ke kiri */
- }
-
-.role-teks { /* admin / resepsionis */
-    margin-top: 10px;/* jarak kecil dari tombol login */
-    font-size: 14px;/* lebih kecil biar rapi */
-    color: #ccc;/* abu-abu muda supaya beda sama teks utama */
+/* Body penuh layar & center pakai flex */
+body {
+    min-height: 100vh !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background-size: cover !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
+/* Container harus full height untuk centering */
+.container {
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 15px !important;
+}
 
+/* Row juga harus ikut flex centering */
+.row.justify-content-center {
+    width: 100%;
+    align-items: center !important;
+    margin: 0 !important;
+}
+
+/* Card login - Navy blue gelap seperti di gambar */
+.card {
+    background-color: #0d1f3c !important;
+    color: white !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+    border: none !important;
+    margin: 0 !important; /* Hilangkan semua margin */
+}
+
+/* Card body */
+.card-body {
+    padding: 0 !important;
+}
+
+/* Padding dalam card - kurangin padding atas bawah biar lebih compact */
+.p-5 {
+    padding: 2rem 2.5rem 2.2rem 2.5rem !important;
+}
+
+/* Text center untuk header */
+.text-center {
+    margin-bottom: 25px !important;
+}
+
+/* Foto logo */
+.foto-kiri {
+    width: 50px;
+    height: auto;
+    margin-bottom: 15px !important;
+    float: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Judul E-Visitor */
+.judul-evisitor {
+    font-size: 26px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    margin-top: 0 !important;
+    color: white !important;
+}
+
+/* Subtitle text */
+.text-white-5 {
+    font-size: 14px !important;
+    color: #cbd5e1 !important;
+    margin-bottom: 0 !important;
+    line-height: 1.4 !important;
+}
+
+/* Label Username/Password/Nama */
+.label {
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    margin-bottom: 8px !important;
+    margin-top: 0 !important;
+    text-align: left !important;
+    display: block !important;
+}
+
+/* Form group spacing - kurangin spacing */
+.form-group {
+    margin-bottom: 16px !important;
+}
+
+/* Input field */
+.form-control-user {
+    background-color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    height: auto !important;
+}
+
+.form-control-user:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+    outline: none !important;
+    background-color: white !important;
+    border-color: transparent !important;
+}
+
+.form-control-user::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Button Login */
+.btn-primary.btn-user {
+    background-color: #5b7fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 13px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-top: 12px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.btn-primary.btn-user:hover {
+    background-color: #4a6eef !important;
+}
+
+.btn-primary.btn-user:active,
+.btn-primary.btn-user:focus {
+    background-color: #3d5dd6 !important;
+    box-shadow: none !important;
+}
+
+/* Role text */
+.role-teks {
+    margin-top: 15px !important;
+    font-size: 14px !important;
+}
+
+.role-teks a {
+    color: #93c5fd !important;
+    text-decoration: none !important;
+}
+
+.role-teks a:hover {
+    color: #60a5fa !important;
+    text-decoration: underline !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .p-5 {
+        padding: 1.8rem 1.8rem 2rem 1.8rem !important;
+    }
+    
+    .judul-evisitor {
+        font-size: 22px !important;
+    }
+    
+    .foto-kiri {
+        width: 45px;
+    }
+}
