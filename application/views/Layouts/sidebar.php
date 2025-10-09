@@ -1,4 +1,82 @@
+<!-- Font Awesome 6 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<!-- Tombol Toggle Sidebar -->
+<button id="toggleSidebar">
+    <i class="fas fa-bars"></i>
+</button>
+
+<!-- Overlay -->
+<div id="sidebarOverlay"></div>
+
+<!-- Sidebar Navigation -->
+<nav class="sidebar">
+    <!-- Logo Section -->
+    <div class="logo">
+        <img src="<?= base_url('assets/img/footer-logo.png'); ?>">
+    </div>
+
+    <!-- Menu Items -->
+    <ul class="menu">
+        <li class="menu-item <?= ($active_page ?? '') == 'dashboard' ? 'active' : ''; ?>">
+            <a href="<?= base_url('tamu/dashboard'); ?>">
+                <i class="fas fa-user-plus"></i>
+                Form Pendaftaran
+            </a>
+        </li>
+        <li class="menu-item <?= ($active_page ?? '') == 'status_kunjungan' ? 'active' : ''; ?>">
+            <a href="<?= base_url('index.php/kunjungan/status_kunjungan'); ?>">
+                <i class="fas fa-eye"></i>
+                Lihat Status Kunjungan
+            </a>
+        </li>
+        <li class="menu-item <?= ($active_page ?? '') == 'qr_code' ? 'active' : ''; ?>">
+            <a href="<?= base_url('index.php/tamu/qr_code'); ?>">
+                <i class="fas fa-qrcode"></i>
+                Lihat QR Code
+            </a>
+        </li>
+    </ul>
+
+    <!-- Logout Section -->
+    <div class="logout">
+        <a href="<?= base_url('index.php/auth/logout'); ?>">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+</nav>
+
+<script>
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function checkScreen() {
+        if (window.innerWidth <= 768) {
+            toggleBtn.style.display = 'block';
+        } else {
+            toggleBtn.style.display = 'none';
+            sidebar.classList.remove('active');
+            overlay.style.display = 'none';
+        }
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.style.display = 'none';
+    });
+
+    window.addEventListener('resize', checkScreen);
+    window.addEventListener('load', checkScreen);
+</script>
 <style>
+    /* Modern Sidebar Styling - Warna Original */
     .sidebar {
         width: 280px;
         background: #000B23;
@@ -18,10 +96,6 @@
         transform: scale(0.5);
     }
 
-    .logo i {
-        margin-right: 10px;
-    }
-
     .menu {
         list-style: none;
         margin: 0;
@@ -29,68 +103,101 @@
     }
 
     .menu-item {
-        margin: 8px 0;
+        margin: 6px 15px;
     }
 
-    .menu-item a {
+    /* Link Styling */
+    .sidebar .menu-item a,
+    .sidebar .logout a {
         display: flex;
         align-items: center;
-        padding: 15px 30px;
+        padding: 14px 20px;
         color: #cbd5e1;
         text-decoration: none;
-        transition: all 0.3s ease;
-        font-size: 14px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 14px !important;
         border: none;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .menu-item.active a {
-        background: #3b82f6;
-        color: white;
-        border-right: 4px solid #60a5fa;
-    }
-
+    /* Hover Effect */
     .menu-item a:hover {
-        background: #3b82f6;
-        color: white;
+        background: rgba(59, 130, 246, 0.15);
+        color: #93c5fd;
+        transform: translateX(4px);
     }
 
-    .menu-item i {
+    /* Active State - Modern Gradient */
+    .menu-item.active a {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.25) 100%) !important;
+        color: white !important;
+        border-left: 4px solid #3b82f6 !important;
+        border-right: none !important;
+        padding-left: 16px !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    .menu-item.active a::after {
+        content: '';
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 6px;
+        background: #60a5fa;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #60a5fa;
+    }
+
+    /* Icon Styling */
+    .sidebar .menu-item i,
+    .sidebar .logout i {
         margin-right: 12px;
         width: 20px;
         text-align: center;
-        font-size: 16px;
+        font-size: 16px !important;
+        line-height: 1;
+        transition: all 0.3s ease;
     }
 
+    .menu-item a:hover i {
+        color: #93c5fd;
+        transform: scale(1.1);
+    }
+
+    .menu-item.active a i {
+        color: #60a5fa;
+    }
+
+    /* Logout Section */
     .logout {
         position: absolute;
         bottom: 30px;
-        left: 0;
-        right: 0;
-        padding: 0 30px;
+        left: 15px;
+        right: 15px;
+        padding: 0;
     }
 
     .logout a {
-        display: flex;
-        align-items: center;
-        padding: 15px 0;
-        color: #cbd5e1;
-        text-decoration: none;
         border-top: 1px solid #334155;
-        font-size: 14px;
-        transition: all 0.3s ease;
+        padding-top: 20px;
+        margin-top: 15px;
     }
 
     .logout a:hover {
-        color: white;
+        background: rgba(239, 68, 68, 0.12);
+        color: #fca5a5;
+        transform: translateX(4px);
     }
 
-    .logout i {
-        margin-right: 12px;
-        width: 20px;
-        text-align: center;
+    .logout a:hover i {
+        color: #fca5a5;
     }
 
-    /* Responsive untuk tablet dan mobile */
+    /* Responsive */
     @media (max-width: 1024px) {
         .sidebar {
             width: 250px;
@@ -103,47 +210,31 @@
             transition: transform 0.3s ease;
             z-index: 1000;
         }
-        
+
         .sidebar.active {
             transform: translateX(0);
         }
     }
-</style>
 
-<!-- Sidebar Navigation -->
-<nav class="sidebar">
-    <!-- Logo Section -->
-    <div class="logo">
-        <img src="<?= base_url('assets/img/footer-logo.png'); ?>">
-    </div>
-    
-    <!-- Menu Items -->
-    <ul class="menu">
-        <li class="menu-item <?= ($active_page ?? '') == 'dashboard' ? 'active' : ''; ?>">
-            <a href="<?= base_url('tamu/dashboard'); ?>">
-                <i class="fas fa-user-plus"></i>
-                Form Pendaftaran
-            </a>
-        </li>
-        <li class="menu-item <?= ($active_page ?? '') == 'status_kunjungan' ? 'active' : ''; ?>">
-            <a href="<?= base_url('tamu/status_kunjungan'); ?>">
-                <i class="fas fa-eye"></i>
-                Lihat Status Kunjungan
-            </a>
-        </li>
-        <li class="menu-item <?= ($active_page ?? '') == 'qr_code' ? 'active' : ''; ?>">
-            <a href="<?= base_url('tamu/qr_code'); ?>">
-                <i class="fas fa-qrcode"></i>
-                Lihat QR Code
-            </a>
-        </li>
-    </ul>
-    
-    <!-- Logout Section -->
-    <div class="logout">
-        <a href="<?= base_url('auth/logout'); ?>">
-            <i class="fas fa-sign-out-alt"></i>
-            Logout
-        </a>
-    </div>
-</nav>
+    #toggleSidebar {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1100;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 12px;
+        cursor: pointer;
+        display: none;
+    }
+
+    #sidebarOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 900;
+    }
+</style>

@@ -30,6 +30,7 @@ class Profil_admin extends CI_Controller
         ];
         $data['active_page'] = 'profil'; // untuk highlight menu sidebar
 
+        
         $this->load->view('admin/profil', $data);
     }
 }

@@ -49,7 +49,6 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-white-900 mb-4 judul-evisitor">E-visitor</h1>
                                         <img src="<?= base_url('assets/img/footer-logo.png'); ?>" alt="Foto User" class="foto-kiri">
-                                        <p class="text-white-5">Selamat datang, silakan login terlebih dahulu</p>
                                     </div>
 
                                     <!-- Pesan error login -->

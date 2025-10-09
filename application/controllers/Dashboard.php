@@ -22,7 +22,7 @@ class Dashboard extends CI_Controller
     // Halaman dashboard admin
     public function index()
     {
-        $data['nama'] = $this->session->userdata('nama_lengkap');
+        $data['nama'] = $this->session->userdata('fullname');
         $data['active_page'] = 'dashboard'; // untuk highlight menu sidebar
 
         // Load view dashboard dan sidebar

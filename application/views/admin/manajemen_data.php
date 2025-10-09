@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Resepsionis</title>
+    <title>Manajemen Data Kunjungan</title>
 
     <!-- CSS Terpisah -->
     <link rel="stylesheet" href="<?= base_url('assets/css/sidebar.css'); ?>">
@@ -14,104 +14,99 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        /* ================================================= */
-        /* 1. Variabel dan Gaya Dasar */
-        /* ================================================= */
-        :root {
-            --color-sidebar-bg: #111b33;
-            --color-main-bg: #f5f6fa;
-            --color-text-light: #b4b4b4;
-            --color-text-dark: #333;
-            --color-primary: #5d5dff;
-            --color-pending: #fddb00;
-            --color-approve: #4caf50;
-            --color-reject: #e53935;
-            --color-border: #ddd;
-            --color-background-light: #f7f7f7;
-            --font-family-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* Body umum */
         body {
-            font-family: var(--font-family-main);
-            background-color: var(--color-main-bg);
-            line-height: 1.6;
-        }
-
-        .dashboard-container {
-            display: flex;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7fa;
             min-height: 100vh;
         }
 
+        /* Main content disesuaikan dengan sidebar */
         .main-content {
-            flex-grow: 1;
+            margin-left: 260px;
             padding: 30px;
-            background-color: var(--color-main-bg);
-            margin-left: 220px;
-            /* Sesuaikan dengan lebar sidebar/ geser tabel ke kanan  */
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Header Section */
         .top-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .title-container {
             display: flex;
             align-items: center;
+            gap: 10px;
+        }
+
+        .title-container h1 {
+            font-size: 22px;
+            color: #1e293b;
+            font-weight: 700;
+            margin: 0;
         }
 
         .header-icon {
-            font-size: 24px;
-            margin-right: 10px;
-            color: var(--color-text-dark);
+            font-size: 22px;
+            color: #1e293b;
         }
 
         .user-info {
+            font-size: 16px;
             font-weight: 600;
-            color: var(--color-text-dark);
+            color: #1e293b;
         }
 
-        /* ================================================= */
-        /* 2. Konten Manajemen Data */
-        /* ================================================= */
+        /* Data Management Section */
         .data-management-section {
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
         }
 
-        /* --- Search & Filter --- */
+        /* Search & Filter Bar */
         .search-filter-bar {
             display: flex;
-            align-items: center;
+            gap: 12px;
             margin-bottom: 25px;
-            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .search-input-group {
             display: flex;
             align-items: center;
             flex-grow: 1;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            padding: 10px 15px;
-            background-color: #fff;
+            min-width: 250px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .search-input-group:focus-within {
+            border-color: #3b82f6;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .search-input-group i {
-            color: var(--color-text-light);
+            color: #94a3b8;
             margin-right: 10px;
+            font-size: 16px;
         }
 
         .search-input-group input {
@@ -119,133 +114,215 @@
             outline: none;
             flex-grow: 1;
             background-color: transparent;
-            font-size: 1em;
+            font-size: 14px;
+            color: #1e293b;
+        }
+
+        .search-input-group input::placeholder {
+            color: #94a3b8;
         }
 
         .filter-button {
-            background: none;
-            border: 1px solid var(--color-border);
-            color: var(--color-text-dark);
-            padding: 10px 14px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 10px;
             cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .filter-button:hover {
-            background-color: var(--color-background-light);
-            border-color: #aaa;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
 
-        /* --- Tabel --- */
+        /* Table Modern */
         .data-table-container {
             width: 100%;
             overflow-x: auto;
-            /* Tambahkan scroll horizontal jika tabel lebar */
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            min-width: 700px;
-            /* Biar tabel tidak terlalu sempit */
-        }
-
-        table th,
-        table td {
-            padding: 14px 15px;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 800px;
         }
 
         table thead {
-            background-color: var(--color-background-light);
-            border-bottom: 2px solid var(--color-border);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
 
         table th {
-            color: var(--color-text-dark);
+            padding: 16px 20px;
+            text-align: left;
+            color: #475569;
             font-weight: 700;
-            font-size: 0.9em;
+            font-size: 13px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
         }
 
-        table tbody tr:nth-child(odd) {
-            background-color: #fcfcfc;
+        table th:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        table th:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        table td {
+            padding: 16px 20px;
+            color: #334155;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        table tbody tr {
+            background-color: #ffffff;
+            transition: all 0.2s ease;
         }
 
         table tbody tr:hover {
-            background-color: #f0f0f0;
+            background-color: #f8fafc;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
-        /* --- Status Badges --- */
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px;
+        }
+
+        table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px;
+        }
+
+        /* Status Badge Modern */
         .status-badge {
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.8em;
+            font-size: 12px;
             font-weight: 600;
             text-align: center;
             display: inline-block;
-            min-width: 70px;
+            min-width: 90px;
             text-transform: capitalize;
         }
 
         .status-badge.pending {
-            background-color: var(--color-pending);
-            color: var(--color-text-dark);
-            border: 1px solid #e6c800;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
         }
 
         .status-badge.approve {
-            background-color: var(--color-approve);
-            color: #fff;
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
         }
 
         .status-badge.reject {
-            background-color: var(--color-reject);
-            color: #fff;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
         }
 
-        /* --- Tombol --- */
+        .status-badge.berkunjung {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+        }
+
+        .status-badge.selesai {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: #4338ca;
+        }
+
+        /* Action Button Modern */
         .action-button {
-            background-color: #e9e9e9;
-            color: var(--color-text-dark);
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #475569;
             border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .action-button:hover {
-            background-color: #dcdcdc;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
+        .action-button i {
+            font-size: 12px;
+        }
+
+        /* Scan QR Button */
         .scan-qr-button {
-            float: right;
-            clear: both;
-            background-color: var(--color-primary);
-            color: #fff;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
             margin-top: 25px;
-            box-shadow: 0 6px 15px rgba(93, 93, 255, 0.4);
-            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-        }
-
-        .scan-qr-button i {
-            margin-right: 8px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: #ffffff;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            float: right;
         }
 
         .scan-qr-button:hover {
-            background-color: #4f4fdd;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(93, 93, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+
+        .scan-qr-button i {
+            font-size: 18px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            font-weight: 500;
         }
 
         /* Clear float */
-        .data-management-section::after {
+        .clearfix::after {
             content: "";
             display: table;
             clear: both;
@@ -255,7 +332,7 @@
 
 <body>
 
-    <?php $this->load->view('layout/sidebar_admin'); ?>
+    <?php $this->load->view('Layout/sidebar_admin'); ?>
 
     <main class="main-content">
         <header class="top-header">
@@ -268,60 +345,222 @@
             </div>
         </header>
 
-        <div class="data-management-section">
-            <div class="search-filter-bar">
-                <div class="search-input-group">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
+
+        <form action="<?= base_url('index.php/manajemen_kunjungan/'); ?>" method="get" class="search-filter-bar">
+            <div class="data-management-section">
+                <div class="search-filter-bar">
+                    <div class="search-input-group">
+                        <i class="fas fa-search"></i>
+                        <input
+                            type="text"
+                            name="keyword"
+                            placeholder="Cari nama, NIK, atau instansi..."
+                            value="<?= isset($keyword) ? htmlspecialchars($keyword) : ''; ?>">
+                    </div>
+                    <button class="submit" class="filter-button">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
                 </div>
-                <button class="filter-button"><i class="fas fa-filter"></i> Filter</button>
-            </div>
 
-            <div class="data-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama</th>
-                            <th>NIK</th>
-                            <th>Tanggal</th>
-                            <th>Instansi</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($kunjungan)): ?>
-                            <?php $no = 1;
-                            foreach ($kunjungan as $row): ?>
-                                <tr>
-                                    <td><?= $no++; ?></td>
-                                    <td><?= htmlspecialchars($row['NAMA']); ?></td>
-                                    <td><?= htmlspecialchars($row['NIK']); ?></td>
-                                    <td><?= date('d/m/y', strtotime($row['TANGGAL'])); ?></td>
-                                    <td><?= htmlspecialchars($row['INSTANSI']); ?></td>
-                                    <td>
-                                        <span class="status-badge <?= strtolower($row['INSTANSI']); ?>">
-                                            <?= ucfirst($row['INSTANSI']); ?>
-                                        </span>
-                                    </td>
-                                    <td><button class="action-button">Details</button></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
+                <div class="data-table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <td colspan="7" style="text-align:center;">Belum ada data</td>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>NIK</th>
+                                <th>Tanggal</th>
+                                <th>Instansi</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
-                        <?php endif; ?>
-                    </tbody>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($kunjungan)): ?>
+                                <?php $no = 1;
+                                foreach ($kunjungan as $row): ?>
+                                    <tr>
+                                        <td><?= $no++; ?></td>
+                                        <td><?= htmlspecialchars($row['NAMA']); ?></td>
+                                        <td><?= htmlspecialchars($row['NIK']); ?></td>
+                                        <td><?= date('d/m/Y', strtotime($row['TANGGAL'])); ?></td>
+                                        <td><?= htmlspecialchars($row['INSTANSI']); ?></td>
+                                        <td>
+                                            <?php
+                                            $status_class = '';
+                                            $status_text = '';
+                                            switch ($row['status']) {
+                                                case 'pending':
+                                                    $status_class = 'pending';
+                                                    $status_text = 'Menunggu';
+                                                    break;
+                                                case 'approved':
+                                                    $status_class = 'berkunjung';
+                                                    $status_text = 'Berkunjung';
+                                                    break;
+                                                case 'rejected':
+                                                    $status_class = 'reject';
+                                                    $status_text = 'Ditolak';
+                                                    break;
+                                                case 'completed':
+                                                    $status_class = 'selesai';
+                                                    $status_text = 'Selesai';
+                                                    break;
+                                                default:
+                                                    $status_class = 'pending';
+                                                    $status_text = ucfirst($row['status']);
+                                            }
+                                            ?>
+                                            <span class="status-badge <?= $status_class; ?>">
+                                                <?= $status_text; ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <!-- mengirimkan visit_id dari setiap baris ke fungsi detail di controller Manajemen_kunjungan. -->
+                                            <a href="<?= base_url('index.php/detail_kunjungan/detail/' . $row['visit_id']); ?>" class="action-button">
+                                                <i class="fas fa-eye"></i> Details
 
-                </table>
-            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <i class="fas fa-inbox"></i>
+                                            <p>Belum ada data kunjungan</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
 
-            <button class="scan-qr-button"><i class="fas fa-qrcode"></i> Scan QR</button>
-        </div>
-    </main>
+                <script>
+                    const searchInput = document.querySelector('input[name="keyword"]');
+                    searchInput.addEventListener('input', function() {
+                        if (this.value.trim() === '') {
+                            // Kalau input kosong, reload halaman biar semua data muncul lagi
+                            window.location.href = "<?= base_url('index.php/manajemen_kunjungan/'); ?>";
+                        }
+                    });
+                </script>
 
-</body>
 
-</html>
+                <!-- Tambahkan di bawah tombol Details (bagian HTML kamu yang ada tombol QR) -->
+                <div class="clearfix">
+                    <button id="scanButton" type="button" class="scan-qr-button">
+                        <i class="fas fa-qrcode"></i> Scan QR Code
+                    </button>
+                </div>
+
+                <!-- Modal untuk scanner -->
+                <div id="qrModal" class="modal-scan" style="display:none;">
+                    <div class="modal-content-scan">
+                        <div id="preview" style="width: 300px; height: 300px;"></div>
+                        <button id="closeModal" class="close-scan-btn">Tutup</button>
+                    </div>
+                </div>
+
+                <!-- Library SweetAlert -->
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                <!-- Library QR Code -->
+                <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+
+                <script>
+                    const scanButton = document.getElementById('scanButton');
+                    const modal = document.getElementById('qrModal');
+                    const closeModal = document.getElementById('closeModal');
+                    let html5QrCode;
+
+                    // Klik tombol scan
+                    scanButton.addEventListener('click', () => {
+                        Swal.fire({
+                            title: "Mengaktifkan Kamera...",
+                            text: "Tunggu sebentar ya",
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+
+                        modal.style.display = 'flex';
+                        html5QrCode = new Html5Qrcode("preview");
+                        html5QrCode.start({
+                                facingMode: "environment"
+                            }, {
+                                fps: 10,
+                                qrbox: 250
+                            },
+                            qrCodeMessage => {
+                                html5QrCode.stop().then(() => {
+                                    modal.style.display = 'none';
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Scan Berhasil!',
+                                        text: 'QR Code terbaca dengan benar ✅',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    });
+                                    // Contoh redirect (opsional):
+                                    // window.location.href 
+                                });
+                            },
+                            errorMessage => {
+                                console.log("Scanning...", errorMessage);
+                            }
+                        ).catch(err => {
+                            console.error("Gagal membuka kamera:", err);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Kamera Gagal Dibuka',
+                                text: 'Pastikan izin kamera diizinkan.'
+                            });
+                        });
+                    });
+
+                    // Tutup modal
+                    closeModal.addEventListener('click', () => {
+                        if (html5QrCode) html5QrCode.stop();
+                        modal.style.display = 'none';
+                    });
+                </script>
+
+                <style>
+                    /* Modal scanner */
+                    .modal-scan {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(0, 0, 0, 0.6);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        z-index: 9999;
+                    }
+
+                    .modal-content-scan {
+                        background: #fff;
+                        padding: 20px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                        text-align: center;
+                        width: 320px;
+                    }
+
+                    .close-scan-btn {
+                        background: #ef4444;
+                        color: #fff;
+                        border: none;
+                        padding: 8px 14px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        margin-top: 10px;
+                    }
+
+                    .close-scan-btn:hover {
+                        background: #dc2626;
+                    }
+                </style>

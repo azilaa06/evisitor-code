@@ -58,3 +58,6 @@ $route['dashboard_admin'] = 'auth/dashboard_admin';
 $route['manajemen_kunjungan'] = 'Manajemen_kunjungan/data';
 $route['profil'] = 'profil_admin/profil';
 $route['manajemen_kunjungan/(:any)'] = 'Manajemen_kunjungan/data/$1';
+$route['kunjungan/sumbit'] = 'kunjungan/submit';
+$route['auth/login'] = 'auth/login_admin';
+$route['kunjungan/detail/(:num)'] = 'detail_kunjungan/detail/$1';

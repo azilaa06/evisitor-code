@@ -19,6 +19,11 @@ class Auth extends CI_Controller {
 
     // Halaman form login admin
     public function login_admin() {
+
+        // kalau sudah login, langsung ke dashboard
+        //if ($this->session->userdata('status') == 'login') {
+          //  redirect('index.php/dashboard'); // atau ke manajemen_kunjungan
+        //}
         $this->load->view('auth/login_admin'); //Baris ini memuat **file view** bernama `login_admin.php
     }
 
@@ -36,10 +41,11 @@ class Auth extends CI_Controller {
                 'nama_lengkap' => $user->nama_lengkap, //Biasanya untuk ditampilkan di tampilan dashboard 
                 'status'       => 'login' //sebagai tanda atau penanda bahwa user sedang login.
             ]);
-                redirect('index.php/dashboard'); //tujuan halaman yang akan dituju.
+         
+            redirect('index.php/dashboard'); //tujuan halaman yang akan dituju.
             } else { //akan **dijalankan kalau login gagal**
             // Kalau salah, tampilkan pesan error
-            $this->session->set_flashdata('error', 'Username / Password / Nama Lengkap salah!');
+            $this->session->set_flashdata('error', 'Username / Password!');
                 redirect('index.php/auth/login_admin'); //Arahkan (pindahkan) user ke halaman lain
         }
     }
@@ -55,6 +61,10 @@ class Auth extends CI_Controller {
         $this->load->view('auth/login_user');
     }
 
+    //kunjungan
+    public function kunjungan() {
+        $this->load->view('tamu/kunjungan_detail');
+    }
 
     // Dashboard admin
     public function dashboard_admin(){  // ambil nama dari session
