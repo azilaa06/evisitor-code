@@ -6,12 +6,11 @@ class Admin_model extends CI_Model
 
     public function __construct()
     {
-        parent::__construct();
-        $this->load->database(); // <--- load database
+        parent::__construct(); //Memanggil constructor bawaan CodeIgniter(agar controller bisa jalan)
+        $this->load->database(); //: mengaktifkan koneksi ke database
     }
 
-    // Ambil user berdasarkan username, password, nama_lengkap
-    public function get_user($username, $password)
+    public function get_user($username, $password) //mengambil data user dari database
     {
         $this->db->where('username', $username);
         $this->db->where('username', $password);

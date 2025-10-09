@@ -68,6 +68,7 @@
         color: #fff;
         border-radius: 5px;
     }
+    
 </style>
 
 <!-- Sidebar Navigation -->

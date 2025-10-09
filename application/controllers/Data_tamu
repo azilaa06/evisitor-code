@@ -29,8 +29,8 @@ class Data_tamu extends CI_Controller
         
         // Data user diambil dari session
         $data['user'] = [
-            'username'     => $this->session->userdata('username'),
-            'nama_lengkap' => $this->session->userdata('nama_lengkap')
+            'username'     => $this->session->userdata('username'), //Ini mengambil data username dari session yang sebelumnya disimpan saat login
+            'nama_lengkap' => $this->session->userdata('nama_lengkap') //mengambil nama lengkap user dari session.
         ];
 
         // Panggil view data_tamu.php
