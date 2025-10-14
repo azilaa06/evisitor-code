@@ -40,7 +40,7 @@
 
             <div class="col-lg-4"> <!-- ukuran latar putih -->
 
-                <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card o-hidden border-0 shadow-lg my-3">
                     <div class="card-body p-0">
                         <!-- Nested Row within Card Body -->
                         <div class="row">
@@ -51,12 +51,20 @@
                                         <img src="<?= base_url('assets/img/footer-logo.png'); ?>" alt="Foto User" class="foto-kiri">
                                         <p class="text-white-5">Selamat datang, silakan login terlebih dahulu</p>
                                     </div>
-                                    <form class="user">
+
+                                    <!-- Pesan error login -->
+                                    <?php if ($this->session->flashdata('error')): ?>
+                                        <div class="alert alert-danger text-center mt-2">
+                                            <?= $this->session->flashdata('error'); ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <form action="<?= base_url('index.php/auth/login_proses'); ?>" method="post">
                                         <div class="form-group">
                                             <p class="label">Username</p>
                                             <input type="text" class="form-control form-control-user"
-                                                id="email" name="email"
-                                                placeholder="Enter Email Address...">
+                                                id="username" name="username"
+                                                placeholder="Enter username Address...">
                                         </div>
                                         <div class="form-group">
                                             <p class="label">Password</p>
@@ -66,14 +74,15 @@
                                         <div class="form-group">
                                             <p class="label">Nama Lengkap</p>
                                             <input type="text" class="form-control form-control-user"
-                                                id="nama" name="nama" placeholder="example">
+                                                id="nama_lengkap" name="nama_lengkap" placeholder="example">
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
                                             Login
                                         </button>
-                                        <div class="text-center role-teks">
-                                            <a href="<?= base_url('index.php/auth/user'); ?>" class="text-white-5">user</a>
-                                        </div>
+                                    </form>
+                                    <div class="text-center role-teks">
+                                        <a href="<?= base_url('index.php/auth/user'); ?>" class="text-white-5">user</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
