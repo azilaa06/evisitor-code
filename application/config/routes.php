@@ -56,5 +56,14 @@ $route['translate_uri_dashes'] = FALSE;
 /* Tambahan route custom */
 $route['dashboard_admin'] = 'auth/dashboard_admin';
 $route['profil'] = 'profil_admin/profil';
-$route['admin/manajemen_data'] = 'manajemen_kunjungan';
-$route['manajemen_kunjungan/(:any)'] = 'Manajemen_kunjungan/data/$1';
+$route['profil/update'] = 'profil_admin/update';
+$route['profil/delete'] = 'profil_admin/delete_account';
+
+// HAPUS semua route manajemen_kunjungan yang konflik
+// Cukup ini aja:
+$route['admin/manajemen_data'] = 'Manajemen_kunjungan/data';
+$route['admin/manajemen_data/(:any)'] = 'Manajemen_kunjungan/data/$1';
+
+// KUNJUNGAN
+$route['kunjungan/submit'] = 'kunjungan/submit';
+$route['kunjungan/detail/(:num)'] = 'detail_kunjungan/detail/$1';

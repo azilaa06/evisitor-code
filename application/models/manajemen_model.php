@@ -101,10 +101,11 @@ class Manajemen_model extends CI_Model
     }
 
     // Ambil detail kunjungan berdasarkan ID
-    public function get_by_id($visit_id)
+    public function get_by_id($visit_id) //menerima parameter $visit_id (ID kunjungan (visit_id) yang ingin kamu ambil datanya.)
     {
-        $this->db->select('
-            visits.*,
+        //menentukan kolom apa aja yang ingin kamu ambil dari database.
+        $this->db->select(' 
+            visits.*, 
             visits.fullname AS visitor_name,
             visits.id_number,
             visits.phone,
@@ -114,8 +115,8 @@ class Manajemen_model extends CI_Model
             users.fullname AS handled_by_name
         ');
         $this->db->from('visits');
-        $this->db->join('users', 'visits.handled_by = users.user_id', 'left');
-        $this->db->where('visits.visit_id', $visit_id);
+        $this->db->join('users', 'visits.handled_by = users.user_id', 'left'); //supaya di halaman detail kunjungan (atau manajemen data) kamu bisa menampilkan nama petugas yang menangani tamu tersebut
+        $this->db->where('visits.visit_id', $visit_id); //Filter data berdasarkan visit_id tertentu.
         return $this->db->get()->row_array();
     }
 
@@ -158,7 +159,7 @@ class Manajemen_model extends CI_Model
     }
 
     // Search kunjungan
-    public function search($keyword)
+    public function search($keyword = null)
     {
         $this->db->select('
             visits.visit_id,
@@ -172,12 +173,15 @@ class Manajemen_model extends CI_Model
             visits.institution AS INSTANSI
         ');
         $this->db->from('visits');
+
+        if (!empty($keyword)) {
         $this->db->group_start();
         $this->db->like('visits.fullname', $keyword);
-        $this->db->or_like('visits.id_number', $keyword);
-        $this->db->or_like('visits.institution', $keyword);
-        $this->db->group_end();
-        $this->db->order_by('visits.scheduled_date', 'DESC');
+        $this->db->or_like('visits.institution', $keyword);  // ✅ bisa cari berdasarkan instansi
+            $this->db->group_end();
+        }
+        $this->db->order_by('visits.scheduled_date', 'DESC'); //mengurutkan data berdasarkan kolom scheduled_date (tanggal kunjungan).(dari yg aku di urutkan dari yg baru di atas yg lama di bawah)
         return $this->db->get()->result_array();
+        
     }
 }

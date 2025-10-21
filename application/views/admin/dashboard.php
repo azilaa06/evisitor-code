@@ -38,7 +38,7 @@
             }
         }
 
-        /* Username pojok kanan atas */
+        /*  jarak ke bawha Username pojok kanan atas */
         .username {
             text-align: right;
             margin-bottom: 20px;
@@ -47,7 +47,7 @@
         .username h2 {
             font-size: 16px;
             color: #1e293b;
-            font-weight: 600;
+            font-weight: normal;
             margin: 0;
         }
 
@@ -200,7 +200,12 @@
     <!-- Konten Utama -->
     <div class="main-content">
         <div class="username">
-            <h2>Selamat datang, <?= isset($nama) ? $nama : $this->session->userdata('username'); ?>!</h2>
+            <h2> <?php
+                    $email = $this->session->userdata('username');
+                    $nama = explode('@', $email)[0];
+                    echo htmlspecialchars($nama) . "";
+                    ?>
+            </h2>
         </div>
 
         <h1><i class="fas fa-home"></i> Dashboard</h1>
@@ -252,7 +257,7 @@
 
             <!-- Card 5: Pengunjung Hari Ini -->
             <div class="card">
-                <a href="<?= base_url('index.php/manajemen_kunjungan/data/Pengunjung Hari Ini') ?>">
+                <a href="<?= base_url('index.php/manajemen_kunjungan/data/Pengunjung_Hari_Ini') ?>">
                     <i class="fas fa-calendar-day card-icon"></i>
                     <div class="card-content">
                         <div class="card-number"><?= isset($count_today) ? $count_today : 0 ?></div>

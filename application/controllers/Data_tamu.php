@@ -19,7 +19,8 @@ class Data_tamu extends CI_Controller
         // Cek apakah sudah login
         if (!$this->session->userdata('status')  //kalau session status kosong / tidak ada, artinya user belum login.//
             || $this->session->userdata('status') != 'login') {
-            redirect('index.php/auth/login');
+                
+            redirect('index.php/auth/login_admin');
         }
     }
 

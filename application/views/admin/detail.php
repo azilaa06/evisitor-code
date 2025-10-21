@@ -4,241 +4,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Resepsionis</title>
-
-    <!-- CSS Terpisah -->
-    <link rel="stylesheet" href="<?= base_url('assets/css/sidebar.css'); ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/dashboard.css'); ?>">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <title>Detail Kunjungan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* FILE: assets/css/detail_kunjungan.css */
-
-        :root {
-            --color-main-bg: #f5f6fa;
-            --color-text-dark: #333;
-            --color-primary: #5d5dff;
-            --color-reject: #e53935;
-            --color-card-bg: #e6f0ff;
-            /* Latar belakang card detail (Biru muda) */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f6fa;
+            margin: 0;
+            padding: 0;
+            /* hapus padding biar gak ganggu posisi konten */
         }
 
-        /* Gaya Konten Utama (dari Layout), background abu*/
+        /* Tambahkan container utama agar tidak ketutup sidebar */
         .main-content {
-            flex-grow: 1;
-            padding: 30px;
-            background-color: var(--color-main-bg);
+            margin-left: 250px;
+            /* sesuaikan dengan lebar sidebar */
+            padding: 40px;
         }
 
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-        }
-
-        .top-header h1 {
-            font-size: 1.8em;
-            color: var(--color-text-dark);
-        }
-
-        .user-info {
-            font-weight: 600;
-            color: var(--color-text-dark);
-        }
-
-        /* --- Gaya Card Detail --- */
+        /* Kotak detail kunjungan */
         .detail-container {
-            padding: 20px;
-        }
-
-        .detail-card {
-            background-color: var(--color-card-bg);
-            /* Warna biru muda */
+            max-width: 900px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 30px 40px;
             border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .detail-form {
-            display: flex;
-            flex-wrap: wrap;
+        h2 {
+            text-align: center;
+            color: #081a48;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            /* Jarak antar form group */
         }
 
-        /* --- Form Group & Input Styling --- */
-        .form-group {
-            display: flex;
-            flex-direction: column;
+        .detail-grid label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .detail-grid input,
+        .detail-grid textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+
+        .detail-grid textarea {
+            min-height: 80px;
+            resize: none;
         }
 
         .full-width {
-            width: 100%;
+            grid-column: 1 / -1;
         }
 
-        .half-width {
-            width: calc(50% - 10px);
-            /* 50% dikurangi setengah gap */
-        }
-
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #fff;
-            /* Input berwarna putih */
-            font-size: 1em;
-            color: var(--color-text-dark);
-            /* Input dibaca (readonly) tapi tetap styling-nya */
-        }
-
-        /* Gaya Khusus untuk area Tujuan */
-        .large-text-area {
-            width: calc(60% - 10px);
-        }
-
-        /* Gaya Khusus untuk area Tanggal */
-        .date-area {
-            width: calc(40% - 10px);
-        }
-
-        .date-input-group {
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-
-        .date-input-group input {
-            padding-right: 40px;
-            /* Ruang untuk ikon */
-            width: 100%;
-        }
-
-        .calendar-icon {
-            position: absolute;
-            right: 15px;
-            color: #777;
-            font-size: 1.1em;
-        }
-
-        /* --- Tombol Aksi --- */
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            /* Posisikan tombol di kanan */
-            gap: 15px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
+        .button-group {
+            text-align: center;
+            margin-top: 25px;
         }
 
         .btn {
-            padding: 12px 30px;
             border: none;
+            padding: 10px 25px;
             border-radius: 8px;
-            font-weight: 700;
+            color: white;
             cursor: pointer;
-            font-size: 1em;
-            transition: opacity 0.3s, transform 0.1s;
-        }
-
-        .btn-reject {
-            background-color: var(--color-reject);
-            color: #fff;
+            font-weight: 500;
+            font-size: 14px;
+            transition: 0.3s;
         }
 
         .btn-approve {
-            background-color: var(--color-primary);
-            color: #fff;
+            background-color: #0b2b74;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
+        .btn-approve:hover {
+            background-color: #0e3a94;
         }
 
-        /*menegaskan lagi latar belakang abu-abu supaya full tinggi layar. */
-        .main-content {
-            margin-left: 250px;/* samain sama lebar sidebar */
-            padding: 20px;
-            background-color: #f5f6fa;/* abu-abu */
-            min-height: 100vh;/* minimal penuh setinggi layar */
+        .btn-reject {
+            background-color: #c0392b;
+            margin-right: 15px;
         }
 
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            background-color: #f5f6fa;/* abu-abu juga untuk nutup area kosong */
+        .btn-reject:hover {
+            background-color: #e74c3c;
+        }
+
+        /* Responsif */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                /* kalau sidebar disembunyikan di mobile */
+                padding: 20px;
+            }
         }
     </style>
-
 </head>
 
 <body>
-
-    <?php $this->load->view('Layouts/sidebar_admin'); ?>
-
     <div class="main-content">
         <div class="detail-container">
-            <h2 class="detail-title">Detail Kunjungan</h2>
+            <h2>Detail Kunjungan</h2>
 
-            <div class="detail-card">
-                <form class="detail-form">
-                    <div class="form-group full-width">
-                        <label for="nama_lengkap">Nama Lengkap</label>
-                        <input type="text" id="nama_lengkap" name="nama_lengkap" value="" readonly>
-                    </div>
+            <form action="<?= base_url('index.php/detail_kunjungan/update_status/' . $pengunjung['visit_id']); ?>" method="post">
+                <div class="detail-grid">
 
-                    <div class="form-group half-width">
-                        <label for="nik">NIK</label>
-                        <input type="text" id="nik" name="nik" value="" readonly>
-                    </div>
-                    <div class="form-group half-width">
-                        <label for="no_telepon">No. Telepon</label>
-                        <input type="text" id="no_telepon" name="no_telepon" value="" readonly>
-                    </div>
+                    <!-- Jadi semua field otomatis terisi sesuai data pengunjung yang kamu klik. -->
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" class="form-input" value="<?= $pengunjung['fullname']; ?>" readonly>
+                </div>
 
-                    <div class="form-group half-width">
-                        <label for="instansi">Instansi</label>
-                        <input type="text" id="instansi" name="instansi" value="" readonly>
-                    </div>
-                    <div class="form-group half-width">
-                        <label for="tujuan_ke">Tujuan ke</label>
-                        <input type="text" id="tujuan_ke" name="tujuan_ke" value="" readonly>
-                    </div>
+                <div class="form-group">
+                    <label>No. Telepon</label>
+                    <input type="text" class="form-input" value="<?= $pengunjung['phone']; ?>" readonly>
+                </div>
 
-                    <div class="form-group large-text-area">
-                        <label for="tujuan">Tujuan</label>
-                        <textarea id="tujuan" name="tujuan" rows="5" readonly></textarea>
-                    </div>
-                    <div class="form-group date-area">
-                        <label for="tanggal">Tanggal</label>
-                        <div class="date-input-group">
-                            <input type="text" id="tanggal" name="tanggal" value="" readonly>
-                            <i class="fas fa-calendar-alt calendar-icon"></i>
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>NIK</label>
+                    <input type="text" class="form-input" value="<?= $pengunjung['id_number']; ?>" readonly>
+                </div>
 
-                    <div class="form-actions full-width">
-                        <button type="button" class="btn btn-reject">Rejected</button>
-                        <button type="button" class="btn btn-approve">Approve</button>
-                    </div>
-                </form>
+                <div class="form-group">
+                    <label>Tujuan ke</label>
+                    <input type="text" class="form-input" value="<?= $pengunjung['to_whom']; ?>" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Instansi</label>
+                    <input type="text" class="form-input" value="<?= $pengunjung['institution']; ?>" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Tanggal</label>
+                    <input type="date" class="form-input" value="<?= date('Y-m-d', strtotime($pengunjung['scheduled_date'])); ?>" readonly>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Tujuan</label>
+                    <textarea class="form-input" readonly><?= $pengunjung['purpose']; ?></textarea>
+                </div>
+
             </div>
-        </div>
+
+            <div class="button-group">
+                <button type="submit" name="status" value="approved" class="btn btn-approve">Approve</button>
+                <button type="submit" name="status" value="rejected" class="btn btn-reject">Reject</button>
+            </div>
+        </form>
+    </div>
+
+
 </body>
 
 </html>
