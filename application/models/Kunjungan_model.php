@@ -33,18 +33,31 @@ class Kunjungan_model extends CI_Model
             ->result_array(); // semua kunjungan pengunjung
     }
 
-    // 🟢 Ambil detail satu kunjungan berdasarkan visit_id
+    // 🟢 Ambil detail satu kunjungan berdasarkan visit_id (DENGAN NAMA PENANGGUNG JAWAB)
     public function get_visit_by_id($visit_id)
     {
-        return $this->db->where('visit_id', $visit_id)
-            ->get($this->table)
-            ->row_array(); // hanya 1 row
+        $this->db->select('v.*, u.fullname as penanggung_jawab');
+        $this->db->from($this->table . ' v');
+        $this->db->join($this->table_users . ' u', 'v.approved_by = u.user_id', 'left');
+        $this->db->where('v.visit_id', $visit_id);
+        
+        return $this->db->get()->row_array();
     }
 
-    // 🟢 Update status kunjungan
-    public function update_status($visit_id, $status)
+    // 🟢 Update status kunjungan (DENGAN APPROVED_BY DAN TIMESTAMP)
+    public function update_status($visit_id, $status, $user_id = null)
     {
+        $data = [
+            'status' => $status
+        ];
+
+        // Jika ada user_id, simpan siapa yang approve/reject
+        if ($user_id) {
+            $data['approved_by'] = $user_id;
+            $data['approved_at'] = date('Y-m-d H:i:s');
+        }
+
         $this->db->where('visit_id', $visit_id);
-        return $this->db->update($this->table, ['status' => $status]); // ✅ Pakai $this->table
+        return $this->db->update($this->table, $data);
     }
 }

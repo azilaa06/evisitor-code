@@ -11,36 +11,38 @@ class Auth extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('Admin_model');   // memanggil model bernama Admin_model
-        $this->load->library('session');    // session CI
-        $this->load->helper('url');         //membantu dalam pembuatan link dan navigasi antar halaman.(redirect/base_url
-        $this->load->database();            //Mengaktifkan koneksi ke database
+        $this->load->model('Admin_model');
+        $this->load->library('session');
+        $this->load->helper('url');
+        $this->load->database();
     }
 
     // Halaman form login admin
     public function login_admin() {
-        $this->load->view('auth/login_admin'); //Baris ini memuat **file view** bernama `login_admin.php
+        $this->load->view('auth/login_admin');
     }
 
-    public function login_proses() //Fungsinya untuk **memproses data login**
+    public function login_proses()
     {
         $username     = $this->input->post('username');
         $password     = $this->input->post('password');
         
         // Ambil data user dari model
-        $user = $this->Admin_model->get_user($username, $password); //memanggil fungsi get_user() dari model Admin_model
+        $user = $this->Admin_model->get_user($username, $password);
 
-            if ($user) { //pengecekan hasil dari model** sebelumnya
-            $this->session->set_userdata([ //Simpan data user ke session
+        if ($user) {
+            // ⭐ TAMBAHAN: Simpan user_id juga ke session
+            $this->session->set_userdata([
+                'user_id'      => $user->user_id,      // 👈 ID untuk approve/reject
                 'username'     => $user->username,
-                'nama_lengkap' => $user->nama_lengkap, //Biasanya untuk ditampilkan di tampilan dashboard 
-                'status'       => 'login' //sebagai tanda atau penanda bahwa user sedang login.
+                'nama_lengkap' => $user->fullname,     // 👈 AMBIL DARI DATABASE (fullname)
+                'status'       => 'login'
             ]);
-                redirect('index.php/dashboard'); //tujuan halaman yang akan dituju.
-            } else { //akan **dijalankan kalau login gagal**
+            redirect('index.php/dashboard');
+        } else {
             // Kalau salah, tampilkan pesan error
             $this->session->set_flashdata('error', 'Username / Password / Nama Lengkap salah!');
-                redirect('index.php/auth/login_admin'); //Arahkan (pindahkan) user ke halaman lain
+            redirect('index.php/auth/login_admin');
         }
     }
 
@@ -55,9 +57,8 @@ class Auth extends CI_Controller {
         $this->load->view('auth/login_user');
     }
 
-
     // Dashboard admin
-    public function dashboard_admin(){  // ambil nama dari session
+    public function dashboard_admin(){
         $data['nama'] = $this->session->userdata('nama_lengkap');
         $this->load->view('admin/dashboard', $data);
     }
@@ -77,6 +78,4 @@ class Auth extends CI_Controller {
 
         $this->load->view('admin/profil_admin', $data);
     }
-} // <-- pastikan class ditutup di sini
-
-
+}

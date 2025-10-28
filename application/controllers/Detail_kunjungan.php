@@ -24,15 +24,14 @@ class Detail_kunjungan extends CI_Controller
     // Tampilkan halaman detail kunjungan
     public function detail($id)
     {
-        $data['pengunjung'] = $this->Kunjungan_model->get_visit_by_id($id); //mengambil satu baris data pengunjung dari database berdasarkan ID yang diterima.
+        $data['pengunjung'] = $this->Kunjungan_model->get_visit_by_id($id);
 
-        if (!$data['pengunjung']) { // jika tidak ditemukan di database maka 404
+        if (!$data['pengunjung']) {
             show_404();
         }
 
-    
-        $data['nama'] = $this->session->userdata('nama_lengkap'); //nama admin / user yang sedang login dari session.
-        $data['active_page'] = 'manajemen_data'; //buat highligt menu di sidebar
+        $data['nama'] = $this->session->userdata('nama_lengkap');
+        $data['active_page'] = 'manajemen_data';
 
         $sidebar_data = [
             'nama' => $data['nama'],
@@ -52,7 +51,11 @@ class Detail_kunjungan extends CI_Controller
             show_error('Status tidak valid');
         }
 
-        $this->Kunjungan_model->update_status($id, $status);
+        // ⭐ Ambil user_id resepsionis yang sedang login
+        $user_id = $this->session->userdata('user_id'); 
+
+        // Update status + simpan siapa yang approve/reject
+        $this->Kunjungan_model->update_status($id, $status, $user_id);
 
         // Redirect ke halaman manajemen data setelah update
         redirect('index.php/manajemen_kunjungan');
