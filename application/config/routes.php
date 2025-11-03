@@ -67,3 +67,10 @@ $route['admin/manajemen_data/(:any)'] = 'Manajemen_kunjungan/data/$1';
 // KUNJUNGAN
 $route['kunjungan/submit'] = 'kunjungan/submit';
 $route['kunjungan/detail/(:num)'] = 'detail_kunjungan/detail/$1';
+$route['tamu/kunjungan_detail/(:num)'] = 'tamu/kunjungan_detail/$1';
+
+
+
+// Route untuk Daftar Kunjungan
+$route['kunjungan/daftar_kunjungan'] = 'Daftar_kunjungan/index';
+$route['kunjungan/daftar_kunjungan/detail/(:num)'] = 'Daftar_kunjungan/detail/$1';

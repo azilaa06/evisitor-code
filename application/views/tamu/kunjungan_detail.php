@@ -35,8 +35,15 @@
         </div>
 
         <div style="margin-top:20px; display:flex; gap:15px;">
-            <a href="<?= base_url('kunjungan/download_qr/'.$visit['visit_id']) ?>" class="btn btn-primary">Download QR</a>
-            <button onclick="window.print()" class="btn btn-secondary">Cetak</button>
+            <a href="<?= base_url('kunjungan/download_qr/'.$visit['visit_id']) ?>" class="btn btn-primary">
+                <i class="fas fa-qrcode"></i> Download QR
+            </a>
+            <button onclick="window.print()" class="btn btn-secondary">
+                <i class="fas fa-print"></i> Cetak
+            </button>
+            <a href="<?= base_url('kunjungan/daftar_kunjungan') ?>" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
         </div>
         <?php else: ?>
             <p style="margin-top:20px;">Belum ada data kunjungan.</p>
@@ -123,91 +130,6 @@ body {
     gap: 12px !important;
 }
 
-/* Status Badge - Modern Glowing Effect */
-.status-badge {
-    color: white;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 13px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-}
-
-/* Approved - Glowing Green */
-.status-approved {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4), 0 0 30px rgba(16, 185, 129, 0.2);
-    animation: glow-green 2s ease-in-out infinite alternate;
-}
-
-/* Rejected - Glowing Red */
-.status-rejected {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4), 0 0 30px rgba(239, 68, 68, 0.2);
-    animation: glow-red 2s ease-in-out infinite alternate;
-}
-
-/* Completed - Glowing Cyan */
-.status-completed {
-    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-    box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4), 0 0 30px rgba(6, 182, 212, 0.2);
-    animation: glow-cyan 2s ease-in-out infinite alternate;
-}
-
-/* Pending - Glowing Orange */
-.status-pending {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4), 0 0 30px rgba(245, 158, 11, 0.2);
-    animation: glow-orange 2s ease-in-out infinite alternate;
-}
-
-/* Unknown - Gray */
-.status-unknown {
-    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-    box-shadow: 0 4px 14px rgba(107, 114, 128, 0.3);
-}
-
-/* Glow Animations */
-@keyframes glow-green {
-    from {
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4), 0 0 30px rgba(16, 185, 129, 0.2);
-    }
-    to {
-        box-shadow: 0 4px 25px rgba(16, 185, 129, 0.6), 0 0 40px rgba(16, 185, 129, 0.3);
-    }
-}
-
-@keyframes glow-red {
-    from {
-        box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4), 0 0 30px rgba(239, 68, 68, 0.2);
-    }
-    to {
-        box-shadow: 0 4px 25px rgba(239, 68, 68, 0.6), 0 0 40px rgba(239, 68, 68, 0.3);
-    }
-}
-
-@keyframes glow-cyan {
-    from {
-        box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4), 0 0 30px rgba(6, 182, 212, 0.2);
-    }
-    to {
-        box-shadow: 0 4px 25px rgba(6, 182, 212, 0.6), 0 0 40px rgba(6, 182, 212, 0.3);
-    }
-}
-
-@keyframes glow-orange {
-    from {
-        box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4), 0 0 30px rgba(245, 158, 11, 0.2);
-    }
-    to {
-        box-shadow: 0 4px 25px rgba(245, 158, 11, 0.6), 0 0 40px rgba(245, 158, 11, 0.3);
-    }
-}
-
 /* Button Styling */
 .btn {
     padding: 12px 30px;
@@ -247,6 +169,17 @@ body {
     box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
 }
 
+.btn-back {
+    background: #94a3b8 !important;
+    color: white !important;
+}
+
+.btn-back:hover {
+    background: #64748b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(148, 163, 184, 0.3);
+}
+
 /* Responsive Mobile */
 @media (max-width: 768px) {
     .main-content {
@@ -270,11 +203,14 @@ body {
     .btn {
         width: 100%;
     }
+    
+    .main-content .form-container > div[style*="display:flex"] {
+        flex-direction: column;
+    }
 }
 
 /* Print Styles */
 @media print {
-    /* Reset margin untuk print */
     body {
         margin: 0;
         padding: 20px;
@@ -291,20 +227,12 @@ body {
         padding: 20px !important;
     }
     
-    /* Sembunyikan tombol Download & Cetak saat print */
+    /* Sembunyikan tombol saat print */
     .main-content .form-container > div[style*="margin-top"]:last-child,
     .main-content .form-container > div[style*="display:flex"] {
         display: none !important;
     }
     
-    /* Tampilkan data kunjungan */
-    .main-content .form-container > div[style*="background:#f8fafc"],
-    .main-content .form-container > div[style*="background: #f8fafc"] {
-        display: block !important;
-        page-break-inside: avoid;
-    }
-    
-    /* Print title */
     .form-title {
         margin-bottom: 20px !important;
     }

@@ -24,6 +24,12 @@
                 Form Pendaftaran
             </a>
         </li>
+        <li class="menu-item <?= ($active_page ?? '') == 'daftar_kunjungan' ? 'active' : ''; ?>">
+            <a href="<?= base_url('kunjungan/daftar_kunjungan'); ?>">
+                <i class="fas fa-list-alt"></i>
+                Daftar Kunjungan
+            </a>
+        </li>
         <li class="menu-item <?= ($active_page ?? '') == 'status_kunjungan' ? 'active' : ''; ?>">
             <a href="<?= base_url('kunjungan/status_kunjungan'); ?>">
                 <i class="fas fa-eye"></i>
