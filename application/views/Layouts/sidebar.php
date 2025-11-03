@@ -33,7 +33,7 @@
         <li class="menu-item <?= ($active_page ?? '') == 'status_kunjungan' ? 'active' : ''; ?>">
             <a href="<?= base_url('kunjungan/status_kunjungan'); ?>">
                 <i class="fas fa-eye"></i>
-                Lihat Status Kunjungan
+                Detail Kunjungan
             </a>
         </li>
         <li class="menu-item <?= ($active_page ?? '') == 'qr_code' ? 'active' : ''; ?>">

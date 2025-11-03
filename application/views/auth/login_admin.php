@@ -26,6 +26,24 @@
             background: url('<?= base_url("assets/img/bg.jpg"); ?>') no-repeat center center fixed;
             background-size: cover;
         }
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+        }
+        
+        .password-toggle:hover {
+            color: #495057;
+        }
     </style>
 
 
@@ -68,8 +86,11 @@
                                         </div>
                                         <div class="form-group">
                                             <p class="label">Password</p>
-                                            <input type="password" class="form-control form-control-user"
-                                                id="password" name="password" placeholder="Password">
+                                            <div class="password-wrapper">
+                                                <input type="password" class="form-control form-control-user"
+                                                    id="password" name="password" placeholder="Password">
+                                                <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                                            </div>
                                         </div>
                                         <div class="form-group">
                                             <p class="label">Nama Lengkap</p>
@@ -103,6 +124,22 @@
 
         <!-- Custom scripts for all pages-->
         <script src="<?= base_url('assets/'); ?>js/sb-admin-2.min.js"></script>
+        
+        <!-- Toggle Password Visibility Script -->
+        <script>
+            const togglePassword = document.querySelector('#togglePassword');
+            const password = document.querySelector('#password');
+
+            togglePassword.addEventListener('click', function () {
+                // Toggle tipe input
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                
+                // Toggle icon mata
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        </script>
 
 </body>
 

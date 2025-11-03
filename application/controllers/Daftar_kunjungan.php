@@ -38,9 +38,10 @@ class Daftar_kunjungan extends CI_Controller
         }
 
         $data['kunjungan'] = $this->Daftar_kunjungan_model->get_by_visitor($visitor_id);
+        $data['active_page'] = 'daftar_kunjungan'; // Tambahkan ini untuk efek sidebar aktif
 
         // Load tampilan daftar kunjungan
-        $this->load->view('Layouts/sidebar');
+        $this->load->view('Layouts/sidebar', $data); // Kirim $data agar active_page tersedia
         $this->load->view('tamu/daftar_kunjungan', $data);
     }
 
@@ -58,9 +59,10 @@ class Daftar_kunjungan extends CI_Controller
 
         // Kirim dengan key 'visit' agar sesuai dengan view yang sudah ada
         $data['visit'] = $kunjungan;
+        $data['active_page'] = 'daftar_kunjungan'; // Tambahkan ini untuk efek sidebar aktif
 
         // Load sidebar dan halaman detail
-        $this->load->view('Layouts/sidebar');
+        $this->load->view('Layouts/sidebar', $data); // Kirim $data agar active_page tersedia
         $this->load->view('tamu/kunjungan_detail', $data);
     }
 }

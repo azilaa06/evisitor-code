@@ -37,6 +37,25 @@
         .error-message.show {
             display: block;
         }
+        
+        /* Style untuk toggle password */
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+        }
+        
+        .password-toggle:hover {
+            color: #495057;
+        }
     </style>
 </head>
 
@@ -103,8 +122,11 @@
                                     </div>
                                     <div class="form-group">
                                         <p class="label">Password</p>
-                                        <input type="password" class="form-control form-control-user"
-                                               id="loginPassword" name="password" placeholder="Enter Password" required minlength="8">
+                                        <div class="password-wrapper">
+                                            <input type="password" class="form-control form-control-user"
+                                                   id="loginPassword" name="password" placeholder="Enter Password" required minlength="8">
+                                            <i class="fas fa-eye password-toggle" id="toggleLoginPassword"></i>
+                                        </div>
                                         <div class="error-message" id="loginPasswordError">Password harus diisi!</div>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-user btn-block">
@@ -131,8 +153,11 @@
                                     </div>
                                     <div class="form-group">
                                         <p class="label">Password</p>
-                                        <input type="password" class="form-control form-control-user"
-                                               id="registerPassword" name="password" placeholder="Enter Password" required minlength="8">
+                                        <div class="password-wrapper">
+                                            <input type="password" class="form-control form-control-user"
+                                                   id="registerPassword" name="password" placeholder="Enter Password" required minlength="8">
+                                            <i class="fas fa-eye password-toggle" id="toggleRegisterPassword"></i>
+                                        </div>
                                         <div class="error-message" id="registerPasswordError">Password harus diisi dan minimal 8 karakter!</div>
                                     </div>
                                     <button type="submit" class="btn btn-success btn-user btn-block">
@@ -168,6 +193,28 @@
     const registerForm = document.getElementById('registerForm');
     const switchToRegister = document.getElementById('switchToRegister');
     const switchToLogin = document.getElementById('switchToLogin');
+
+    // Toggle Password untuk Login Form
+    const toggleLoginPassword = document.querySelector('#toggleLoginPassword');
+    const loginPassword = document.querySelector('#loginPassword');
+
+    toggleLoginPassword.addEventListener('click', function () {
+        const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        loginPassword.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    // Toggle Password untuk Register Form
+    const toggleRegisterPassword = document.querySelector('#toggleRegisterPassword');
+    const registerPassword = document.querySelector('#registerPassword');
+
+    toggleRegisterPassword.addEventListener('click', function () {
+        const type = registerPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        registerPassword.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
 
     // Switch ke Register
     switchToRegister.onclick = () => {
