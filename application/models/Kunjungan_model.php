@@ -40,13 +40,18 @@ class Kunjungan_model extends CI_Model
     }
 
     // 🟢 Ambil detail satu kunjungan berdasarkan visit_id (DENGAN NAMA PENANGGUNG JAWAB)
-    public function get_visit_by_id($visit_id)
+    public function get_visit_by_id($visit_id, $visitor_id = null)
     {
         $this->db->select('v.*, 
             COALESCE(u.fullname, "Belum ditentukan") as penanggung_jawab');
         $this->db->from($this->table . ' v');
         $this->db->join($this->table_users . ' u', 'v.approved_by = u.user_id', 'left');
         $this->db->where('v.visit_id', $visit_id);
+        
+        // Jika ada visitor_id, pastikan hanya ambil data milik visitor tersebut (untuk keamanan)
+        if ($visitor_id) {
+            $this->db->where('v.visitor_id', $visitor_id);
+        }
         
         return $this->db->get()->row_array();
     }
@@ -66,5 +71,12 @@ class Kunjungan_model extends CI_Model
 
         $this->db->where('visit_id', $visit_id);
         return $this->db->update($this->table, $data);
+    }
+
+    // 🟢 Update QR token untuk kunjungan (untuk data lama yang belum punya QR)
+    public function update_qr_token($visit_id, $qr_token)
+    {
+        $this->db->where('visit_id', $visit_id);
+        return $this->db->update($this->table, ['qr_token' => $qr_token]);
     }
 }

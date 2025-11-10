@@ -37,7 +37,7 @@
             </a>
         </li>
         <li class="menu-item <?= ($active_page ?? '') == 'qr_code' ? 'active' : ''; ?>">
-            <a href="<?= base_url('tamu/qr_code'); ?>">
+            <a href="<?= base_url('qr_code'); ?>">
                 <i class="fas fa-qrcode"></i>
                 Lihat QR Code
             </a>

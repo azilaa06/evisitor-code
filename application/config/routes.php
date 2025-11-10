@@ -74,3 +74,27 @@ $route['tamu/kunjungan_detail/(:num)'] = 'tamu/kunjungan_detail/$1';
 // Route untuk Daftar Kunjungan
 $route['kunjungan/daftar_kunjungan'] = 'Daftar_kunjungan/index';
 $route['kunjungan/daftar_kunjungan/detail/(:num)'] = 'Daftar_kunjungan/detail/$1';
+
+// Generate QR Code setelah approve
+$route['qr_code/generate/(:num)'] = 'qr_code/generate/$1';
+
+// View QR Code untuk visitor (dengan sidebar - admin)
+$route['qr_code/view/(:num)'] = 'qr_code/view/$1';
+
+// View QR Code by token (tanpa sidebar - public untuk visitor)
+$route['qr_code/token/(:any)'] = 'qr_code/view_by_token/$1';
+
+// Scan QR Code page
+$route['qr_code/scan'] = 'qr_code/scan';
+
+// Check-in process (AJAX)
+$route['qr_code/checkin'] = 'qr_code/checkin';
+
+// Check-out process
+$route['qr_code/checkout/(:num)'] = 'qr_code/checkout/$1';
+
+// Active visitors list (yang sedang check-in)
+$route['qr_code/active'] = 'qr_code/active';
+
+// Main QR Code management page
+$route['qr_code'] = 'qr_code/index';

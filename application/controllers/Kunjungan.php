@@ -17,6 +17,20 @@ class Kunjungan extends CI_Controller
         $this->load->helper(['url', 'form']);
     }
 
+// ========================
+// KUNJUNGAN MODEL
+// ========================
+// Tambahkan method ini ke file: application/models/Kunjungan_model.php
+
+/*
+// 🟢 Update QR token untuk kunjungan (untuk data lama yang belum punya QR)
+public function update_qr_token($visit_id, $qr_token)
+{
+    $this->db->where('visit_id', $visit_id);
+    return $this->db->update('visits', ['qr_token' => $qr_token]);
+}
+*/
+
     // ✅ Halaman form kunjungan (pakai dashboard.php)
     public function index()
     {
@@ -56,6 +70,9 @@ class Kunjungan extends CI_Controller
             redirect('kunjungan');
         }
 
+        // Generate QR token unik untuk kunjungan baru
+        $qr_token = 'VISIT-' . time() . '-' . substr(md5(uniqid(rand(), true)), 0, 8);
+
         // Ambil data input
         $data = [
             'visitor_id'     => $visitor_id,
@@ -66,6 +83,7 @@ class Kunjungan extends CI_Controller
             'to_whom'        => $this->input->post('to_whom'),
             'scheduled_date' => $this->input->post('scheduled_date'),
             'purpose'        => $this->input->post('purpose'),
+            'qr_token'       => $qr_token,  // ✅ TAMBAHAN: Simpan QR token
             'created_at'     => date('Y-m-d H:i:s')
         ];
 
@@ -82,14 +100,46 @@ class Kunjungan extends CI_Controller
     }
 
     // ✅ Halaman detail/status kunjungan
-    public function status_kunjungan()
+    public function status_kunjungan($visit_id = null)
     {
         $visitor_id = $this->session->userdata('visitor_id');
         if (!$visitor_id) {
             redirect('login');
         }
 
-        $data['visit'] = $this->Kunjungan_model->get_last_visit_by_visitor($visitor_id);
+        // Kalau ada visit_id dari URL (diklik dari daftar), ambil data spesifik
+        if ($visit_id) {
+            $data['visit'] = $this->Kunjungan_model->get_visit_by_id($visit_id, $visitor_id);
+            
+            // Cek apakah kunjungan ini milik user yang login
+            if (!$data['visit']) {
+                $this->session->set_flashdata('error', 'Data kunjungan tidak ditemukan atau bukan milik Anda.');
+                redirect('kunjungan/daftar_kunjungan');
+            }
+        } else {
+            // Kalau tidak ada visit_id (akses langsung dari menu), ambil yang terakhir
+            $data['visit'] = $this->Kunjungan_model->get_last_visit_by_visitor($visitor_id);
+        }
+
+        // ✅ PERBAIKAN: Generate QR token dengan prioritas
+        if (isset($data['visit']['qr_token']) && !empty($data['visit']['qr_token'])) {
+            // Jika sudah ada qr_token di database, pakai itu
+            $data['qr_token'] = $data['visit']['qr_token'];
+        } else {
+            // Jika tidak ada (data lama), generate dari ID dan timestamp
+            if (isset($data['visit']['id'])) {
+                $created_at = isset($data['visit']['created_at']) ? $data['visit']['created_at'] : date('Y-m-d H:i:s');
+                $data['qr_token'] = 'VISIT-' . $data['visit']['id'] . '-' . substr(md5($data['visit']['id'] . $created_at), 0, 8);
+                
+                // ✅ OPTIONAL: Update database dengan qr_token yang baru di-generate
+                // Ini memastikan QR code konsisten untuk kunjungan yang sama
+                $this->Kunjungan_model->update_qr_token($data['visit']['id'], $data['qr_token']);
+            } else {
+                // Fallback jika tidak ada ID
+                $data['qr_token'] = 'NO_VISIT_DATA_' . time();
+            }
+        }
+
         $data['active_page'] = 'status_kunjungan';
         $data['nama'] = $this->session->userdata('nama');
         $data['username'] = $this->session->userdata('username');

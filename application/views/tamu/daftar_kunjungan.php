@@ -41,7 +41,7 @@
                     $waktu_kunjungan = date('H:i', strtotime($row->scheduled_date));
                 ?>
                 <div class="visitor-card"
-                     onclick="window.location.href='<?= base_url('kunjungan/daftar_kunjungan/detail/' . $row->visit_id) ?>'">
+                     onclick="window.location.href='<?= base_url('kunjungan/status_kunjungan/' . $row->visit_id) ?>'">
                     <div class="visitor-info">
                         <i class="fas fa-user-circle"></i>
                         <div class="info-content">
