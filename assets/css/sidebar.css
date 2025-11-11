@@ -1,0 +1,44 @@
+/* === SIDEBAR STYLE === */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f6f8;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background: linear-gradient(180deg, #2c3e50, #34495e);
+    color: #fff;
+    padding-top: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 22px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: background 0.3s, padding-left 0.3s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #1abc9c;
+    padding-left: 25px;
+    color: #fff;
+}
+
+.main-content {
+    margin-left: 230px;
+    padding: 20px;
+}

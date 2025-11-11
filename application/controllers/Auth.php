@@ -1,15 +1,18 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * @property CI_Input $input
  * @property CI_Session $session
  * @property Admin_model $Admin_model
+ * @property Get_today_visits $Get_today_visits
  */
 
-class Auth extends CI_Controller {
+class Auth extends CI_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->model('Admin_model');   // memanggil model bernama Admin_model
         $this->load->library('session');    // session CI
@@ -18,7 +21,13 @@ class Auth extends CI_Controller {
     }
 
     // Halaman form login admin
-    public function login_admin() {
+    public function login_admin()
+    {
+
+        // kalau sudah login, langsung ke dashboard
+        //if ($this->session->userdata('status') == 'login') {
+        //  redirect('index.php/dashboard'); // atau ke manajemen_kunjungan
+        //}
         $this->load->view('auth/login_admin'); //Baris ini memuat **file view** bernama `login_admin.php
     }
 
@@ -26,44 +35,49 @@ class Auth extends CI_Controller {
     {
         $username     = $this->input->post('username');
         $password     = $this->input->post('password');
-        
+
         // Ambil data user dari model
         $user = $this->Admin_model->get_user($username, $password); //memanggil fungsi get_user() dari model Admin_model
 
-            if ($user) { //pengecekan hasil dari model** sebelumnya
+        if ($user) { //pengecekan hasil dari model** sebelumnya
             $this->session->set_userdata([ //Simpan data user ke session
+                'user_id'      => $user->user_id, //ID untuk approve/reject
                 'username'     => $user->username,
                 'nama_lengkap' => $user->nama_lengkap, //Biasanya untuk ditampilkan di tampilan dashboard 
                 'status'       => 'login' //sebagai tanda atau penanda bahwa user sedang login.
             ]);
-                redirect('index.php/dashboard'); //tujuan halaman yang akan dituju.
-            } else { //akan **dijalankan kalau login gagal**
+
+            redirect('index.php/dashboard'); //tujuan halaman yang akan dituju.
+        } else { //akan **dijalankan kalau login gagal**
             // Kalau salah, tampilkan pesan error
-            $this->session->set_flashdata('error', 'Username / Password / Nama Lengkap salah!');
-                redirect('index.php/auth/login_admin'); //Arahkan (pindahkan) user ke halaman lain
+            $this->session->set_flashdata('error', 'Username / Password!');
+            redirect('index.php/auth/login_admin'); //Arahkan (pindahkan) user ke halaman lain
         }
     }
 
     // Logout
-    public function logout() {
+    public function logout()
+    {
         $this->session->sess_destroy();
         redirect('index.php/auth/login_admin');
     }
 
     // Login user
-    public function user() {
+    public function user()
+    {
         $this->load->view('auth/login_user');
     }
 
-
-    // Dashboard admin
-    public function dashboard_admin(){  // ambil nama dari session
-        $data['nama'] = $this->session->userdata('nama_lengkap');
-        $this->load->view('admin/dashboard', $data);
+    //kunjungan
+    public function kunjungan()
+    {
+        $this->load->view('tamu/kunjungan_detail');
     }
 
+   
     // Profil admin
-    public function profil() {
+    public function profil()
+    {
         // Cek session login dulu
         if (!$this->session->userdata('status') || $this->session->userdata('status') != 'login') {
             redirect('auth/login_admin');
@@ -78,6 +92,3 @@ class Auth extends CI_Controller {
         $this->load->view('admin/profil_admin', $data);
     }
 } // <-- pastikan class ditutup di sini
-
-
-

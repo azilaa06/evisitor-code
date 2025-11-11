@@ -18,16 +18,51 @@ class Manajemen_kunjungan extends CI_Controller
     // parameter $status bisa kosong atau diisi
     public function data($status = null)
     {
-        
+
+        // Ambil keyword dari form search (GET)
+        $keyword = $this->input->get('keyword');
+
         // Status untuk judul halaman
         $data['status'] = $status ? ucfirst($status) : "Semua Data";
 
-        // Kosongkan data kunjungan supaya tabel tetap tampil tapi tidak ada isi
-        $data['kunjungan'] = [];
+
+        // Jika ada keyword, pakai hasil search; kalau tidak, tampilkan semua
+        if (!empty($keyword)) {
+            $data['kunjungan'] = $this->Manajemen_model->search($keyword);
+        } else {
+            // Kalau kosong, tampilkan semua (atau berdasarkan status jika ada)
+            if ($status) {
+                $data['kunjungan'] = $this->Manajemen_model->get_by_status($status);
+            } else {
+                $data['kunjungan'] = $this->Manajemen_model->get_all();
+            }
+        }
+        //Simpan keyword biar bisa ditampilkan lagi di input search
+        $data['keyword'] = $keyword;
+
+        // Simpan status biar tahu sedang filter status apa
+        $data['status'] = $status;
+
+        //Highlight menu sidebar
         $data['active_page'] = 'manajemen_data'; // untuk highlight menu sidebar
 
         // Load view
         $this->load->view('layout/sidebar_admin', $data);
         $this->load->view('admin/manajemen_data', $data);
+    }
+
+
+    //menampilkan halaman utama (view) dari menu manajemen data dengan fitur pencarian (search).
+    public function index()
+    {
+        $keyword = $this->input->get('keyword'); // ambil dari form search
+        $data['visits'] = $this->Manajemen_model->search($keyword); //Di sini controller memanggil fungsi search() dari model Manajemen_model
+        $data['keyword'] = $keyword; //Ini menyimpan kata kunci yang tadi diinput
+
+        //Bagian ini menampilkan halaman web dengan menggabungkan beberapa view file:
+        $this->load->view('templates/header');
+        $this->load->view('templates/sidebar');
+        $this->load->view('manajemen_data', $data);
+        $this->load->view('templates/footer');
     }
 }

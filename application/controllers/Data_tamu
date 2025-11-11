@@ -17,16 +17,19 @@ class Data_tamu extends CI_Controller
         $this->load->helper('url');
 
         // Cek apakah sudah login
-        if (!$this->session->userdata('status')  //kalau session status kosong / tidak ada, artinya user belum login.//
-            || $this->session->userdata('status') != 'login') {
-            redirect('index.php/auth/login');
+        if (
+            !$this->session->userdata('status')  //kalau session status kosong / tidak ada, artinya user belum login.//
+            || $this->session->userdata('status') != 'login'
+        ) {
+
+            redirect('index.php/auth/login_admin');
         }
     }
 
     // Halaman Data Tamu
     public function index()
     {
-        
+
         // Data user diambil dari session
         $data['user'] = [
             'username'     => $this->session->userdata('username'), //Ini mengambil data username dari session yang sebelumnya disimpan saat login
