@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Tamu_model extends CI_Model
 {
+<<<<<<< HEAD
     private $table_visitors = 'visitors'; // tabel untuk user/visitor login
     private $table_visits   = 'visits';   // tabel untuk data kunjungan
 
@@ -45,10 +46,33 @@ class Tamu_model extends CI_Model
 
         if ($visitor && password_verify($password, $visitor['password'])) {
             return $visitor;
+=======
+    private $table = 'visitors';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->database();
+    }
+
+    // Ambil tamu berdasarkan email
+    public function get_by_email($email)
+    {
+        return $this->db->get_where($this->table, ['email' => $email])->row_array();
+    }
+
+    // Login tamu
+    public function login($email, $password)
+    {
+        $user = $this->get_by_email($email);
+        if ($user && password_verify($password, $user['password'])) {
+            return $user;
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
         }
         return false;
     }
 
+<<<<<<< HEAD
     // tambahan method check_login (kalau kamu mau pakai cara lain)
     public function check_login($email, $password)
     {
@@ -80,5 +104,12 @@ class Tamu_model extends CI_Model
     public function get_by_email($email)
     {
         return $this->db->get_where($this->table_visitors, ['email' => $email])->row_array();
+=======
+    // Register tamu
+    public function register($data)
+    {
+        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+        return $this->db->insert($this->table, $data);
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
     }
 }

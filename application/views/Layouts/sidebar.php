@@ -13,13 +13,21 @@
 <nav class="sidebar">
     <!-- Logo Section -->
     <div class="logo">
+<<<<<<< HEAD
         <img src="<?= base_url('index.php/assets/img/footer-logo.png'); ?>">
+=======
+        <img src="<?= base_url('assets/img/footer-logo.png'); ?>">
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
     </div>
 
     <!-- Menu Items -->
     <ul class="menu">
         <li class="menu-item <?= ($active_page ?? '') == 'dashboard' ? 'active' : ''; ?>">
+<<<<<<< HEAD
             <a href="<?= base_url('index.php/tamu/dashboard'); ?>">
+=======
+            <a href="<?= base_url('tamu/dashboard'); ?>">
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
                 <i class="fas fa-user-plus"></i>
                 Form Pendaftaran
             </a>

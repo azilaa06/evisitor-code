@@ -40,6 +40,7 @@
         .error-message.show {
             display: block;
         }
+<<<<<<< HEAD
 
         /*Password */
         .password-wrapper {
@@ -58,6 +59,8 @@
         .form-control {
             padding-right: 40px;
         }
+=======
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
     </style>
 </head>
 
@@ -124,12 +127,18 @@
                                         </div>
                                         <div class="form-group">
                                             <p class="label">Password</p>
+<<<<<<< HEAD
                                             <div class="password-wrapper">
                                                 <input type="password" id="password" class="form-control" placeholder="Password">
                                                 <span class="password-toggle" id="passwordToggle">
                                                     <i class="fas fa-eye"></i>
                                                 </span>
                                             </div>
+=======
+                                            <input type="password" class="form-control form-control-user"
+                                                id="loginPassword" name="password" placeholder="Enter Password" required minlength="8">
+                                            <div class="error-message" id="loginPasswordError">Password harus diisi!</div>
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
                                         </div>
                                         <script>
                                             document.getElementById('passwordToggle').addEventListener('click', function() {

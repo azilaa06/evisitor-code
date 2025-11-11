@@ -25,6 +25,7 @@ class Profil_admin extends CI_Controller
         $user_id = $this->session->userdata('user_id');
         $username = $this->session->userdata('username');
 
+<<<<<<< HEAD
         if (!$user_id && !$username) {
             redirect('index.php/auth/login');
         }
@@ -36,6 +37,9 @@ class Profil_admin extends CI_Controller
         }
 
         $data['active_page'] = 'profil';
+=======
+        
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
         $this->load->view('admin/profil', $data);
     }
 

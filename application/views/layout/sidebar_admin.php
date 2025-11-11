@@ -46,6 +46,7 @@
         </a>
     </div>
 </nav>
+<<<<<<< HEAD
 <script>
     if (typeof sidebarToggleBtn_admin === 'undefined') {
         const sidebarToggleBtn_admin = document.getElementById('toggleSidebar');
@@ -79,6 +80,37 @@
 
 
 
+=======
+
+<script>
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function checkScreen() {
+        if (window.innerWidth <= 768) {
+            toggleBtn.style.display = 'block';
+        } else {
+            toggleBtn.style.display = 'none';
+            sidebar.classList.remove('active');
+            overlay.style.display = 'none';
+        }
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.style.display = 'none';
+    });
+
+    window.addEventListener('resize', checkScreen);
+    window.addEventListener('load', checkScreen);
+</script>
+>>>>>>> 4d35f43bec7cc0cd6247a03b34ce725a2f929514
 <style>
     /* Modern Sidebar Styling - Warna Original */
     .sidebar {

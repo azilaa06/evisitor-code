@@ -38,7 +38,7 @@
             }
         }
 
-        /*  jarak ke bawha Username pojok kanan atas */
+        /*  jarak ke bawah Username pojok kanan atas */
         .username {
             text-align: right;
             margin-bottom: 20px;
@@ -75,8 +75,6 @@
             max-width: 1300px;
         }
 
-
-
         /* Card dengan desain seperti gambar */
         .card {
             position: relative;
@@ -111,6 +109,10 @@
 
         .card:nth-child(5) {
             background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+
+        .card:nth-child(6) {
+            background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
         }
 
         .card:hover {
@@ -191,7 +193,6 @@
                 font-size: 40px;
             }
         }
-        
     </style>
 </head>
 
@@ -203,11 +204,12 @@
     <!-- Konten Utama -->
     <div class="main-content">
         <div class="username">
-            <h2> <?php
-                    $email = $this->session->userdata('username');
-                    $nama = explode('@', $email)[0];
-                    echo htmlspecialchars($nama) . "";
-                    ?>
+            <h2>
+                <?php
+                $email = $this->session->userdata('username');
+                $nama = explode('@', $email)[0];
+                echo htmlspecialchars($nama);
+                ?>
             </h2>
         </div>
 
@@ -272,14 +274,13 @@
             <!-- Card 6: Approved -->
             <div class="card">
                 <a href="<?= base_url('index.php/manajemen_kunjungan/data/Approved') ?>">
-                    <i class="fas fa-calendar-day card-icon"></i>
+                    <i class="fas fa-thumbs-up card-icon"></i>
                     <div class="card-content">
                         <div class="card-number"><?= isset($total_approved) ? $total_approved : 0 ?></div>
-                        <div class="card-label">APPROVED</div>
+                        <div class="card-label">Approved</div>
                     </div>
                 </a>
             </div>
-
         </div>
     </div>
 

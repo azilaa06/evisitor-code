@@ -5,7 +5,6 @@ class Kunjungan_model extends CI_Model
 {
     private $table = 'visits'; // pastikan sesuai nama tabel di database
 
-    
     // 🟢 Simpan data kunjungan baru
     public function insert_visit($data)
     {
@@ -30,7 +29,6 @@ class Kunjungan_model extends CI_Model
             ->result_array(); // semua kunjungan pengunjung
     }
 
-
     // 🟢 Ambil detail satu kunjungan berdasarkan visit_id
     public function get_visit_by_id($visit_id)
     {
@@ -39,11 +37,10 @@ class Kunjungan_model extends CI_Model
             ->row_array(); // hanya 1 row
     }
 
-
-    //Model yang bertugas menjalankan query untuk mengubah data di tabel.
+    // 🟢 Update status kunjungan
     public function update_status($visit_id, $status)
     {
         $this->db->where('visit_id', $visit_id);
-        return $this->db->update('visits', ['status' => $status]);
+        return $this->db->update($this->table, ['status' => $status]);
     }
 }
