@@ -11,16 +11,42 @@ class Admin_model extends CI_Model
         $this->load->database();
     }
 
+    // ========================================
+    // 🔹 FITUR DARI BRANCH MAIN (Login dengan password_verify)
+    // ========================================
+    
     /**
      * Ambil user berdasarkan username & password (untuk login)
+     * Menggunakan password_verify untuk keamanan
      */
     public function get_user($username, $password)
     {
+        // Ambil user berdasarkan username
+        $this->db->where('username', $username);
+        $query = $this->db->get($this->table);
+        $user = $query->row();
+        
+        // Jika user ditemukan, cek password dengan hash
+        if ($user && password_verify($password, $user->password)) {
+            return $user; // Login berhasil
+        } 
+        
+        // Fallback: Cek dengan MD5 (untuk data lama yang masih pakai MD5)
         $this->db->where('username', $username);
         $this->db->where('password', md5($password));
-        return $this->db->get($this->table)->row();
+        $query_md5 = $this->db->get($this->table);
+        
+        if ($query_md5->num_rows() > 0) {
+            return $query_md5->row();
+        }
+        
+        return null; // Login gagal
     }
 
+    // ========================================
+    // 🔹 FITUR DARI BRANCH TIA (Profil & Management User)
+    // ========================================
+    
     /**
      * Ambil data user berdasarkan user_id
      */
@@ -64,6 +90,19 @@ class Admin_model extends CI_Model
     public function get_all_users()
     {
         return $this->db->get($this->table)->result();
+    }
+
+    // ========================================
+    // 🔹 FITUR DARI BRANCH MAIN (Count by status)
+    // ========================================
+    
+    /**
+     * Hitung jumlah pengunjung menurut status
+     */
+    public function get_count_by_status($status)
+    {
+        $this->db->where('status', $status);
+        return $this->db->count_all_results('visits');
     }
 }
 ?>

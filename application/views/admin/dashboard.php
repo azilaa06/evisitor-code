@@ -38,7 +38,7 @@
             }
         }
 
-        /*  jarak ke bawha Username pojok kanan atas */
+        /* Jarak ke bawah Username pojok kanan atas */
         .username {
             text-align: right;
             margin-bottom: 20px;
@@ -69,10 +69,10 @@
         /* Container semua card */
         .cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 18px;
             margin-top: 25px;
-            max-width: 1200px;
+            max-width: 1300px;
         }
 
         /* Card dengan desain seperti gambar */
@@ -109,6 +109,10 @@
 
         .card:nth-child(5) {
             background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        }
+
+        .card:nth-child(6) {
+            background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
         }
 
         .card:hover {
@@ -200,11 +204,12 @@
     <!-- Konten Utama -->
     <div class="main-content">
         <div class="username">
-            <h2> <?php
-                    $email = $this->session->userdata('username');
-                    $nama = explode('@', $email)[0];
-                    echo htmlspecialchars($nama) . "";
-                    ?>
+            <h2>
+                <?php
+                $email = $this->session->userdata('username');
+                $nama = explode('@', $email)[0];
+                echo htmlspecialchars($nama);
+                ?>
             </h2>
         </div>
 
@@ -216,7 +221,12 @@
                 <a href="<?= base_url('index.php/manajemen_kunjungan/data/ditolak') ?>">
                     <i class="fas fa-times-circle card-icon"></i>
                     <div class="card-content">
-                        <div class="card-number"><?= isset($count_ditolak) ? $count_ditolak : 0 ?></div>
+                        <div class="card-number">
+                            <?php 
+                            // Support kedua variabel: count_ditolak (TIA) atau total_ditolak (MAIN)
+                            echo isset($count_ditolak) ? $count_ditolak : (isset($total_ditolak) ? $total_ditolak : 0); 
+                            ?>
+                        </div>
                         <div class="card-label">Permohonan Ditolak</div>
                     </div>
                 </a>
@@ -227,7 +237,11 @@
                 <a href="<?= base_url('index.php/manajemen_kunjungan/data/berkunjung') ?>">
                     <i class="fas fa-user-clock card-icon"></i>
                     <div class="card-content">
-                        <div class="card-number"><?= isset($count_berkunjung) ? $count_berkunjung : 0 ?></div>
+                        <div class="card-number">
+                            <?php 
+                            echo isset($count_berkunjung) ? $count_berkunjung : (isset($total_berkunjung) ? $total_berkunjung : 0); 
+                            ?>
+                        </div>
                         <div class="card-label">Sedang Berkunjung</div>
                     </div>
                 </a>
@@ -238,7 +252,11 @@
                 <a href="<?= base_url('index.php/manajemen_kunjungan/data/menunggu') ?>">
                     <i class="fas fa-hourglass-half card-icon"></i>
                     <div class="card-content">
-                        <div class="card-number"><?= isset($count_menunggu) ? $count_menunggu : 0 ?></div>
+                        <div class="card-number">
+                            <?php 
+                            echo isset($count_menunggu) ? $count_menunggu : (isset($total_menunggu) ? $total_menunggu : 0); 
+                            ?>
+                        </div>
                         <div class="card-label">Menunggu Approval</div>
                     </div>
                 </a>
@@ -249,7 +267,11 @@
                 <a href="<?= base_url('index.php/manajemen_kunjungan/data/selesai') ?>">
                     <i class="fas fa-check-circle card-icon"></i>
                     <div class="card-content">
-                        <div class="card-number"><?= isset($count_selesai) ? $count_selesai : 0 ?></div>
+                        <div class="card-number">
+                            <?php 
+                            echo isset($count_selesai) ? $count_selesai : (isset($total_selesai) ? $total_selesai : 0); 
+                            ?>
+                        </div>
                         <div class="card-label">Telah Berkunjung</div>
                     </div>
                 </a>
@@ -260,8 +282,27 @@
                 <a href="<?= base_url('index.php/manajemen_kunjungan/data/Pengunjung_Hari_Ini') ?>">
                     <i class="fas fa-calendar-day card-icon"></i>
                     <div class="card-content">
-                        <div class="card-number"><?= isset($count_today) ? $count_today : 0 ?></div>
+                        <div class="card-number">
+                            <?php 
+                            echo isset($count_today) ? $count_today : (isset($total_today) ? $total_today : 0); 
+                            ?>
+                        </div>
                         <div class="card-label">Pengunjung Hari Ini</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 6: Approved -->
+            <div class="card">
+                <a href="<?= base_url('index.php/manajemen_kunjungan/data/Approved') ?>">
+                    <i class="fas fa-thumbs-up card-icon"></i>
+                    <div class="card-content">
+                        <div class="card-number">
+                            <?php 
+                            echo isset($count_approved) ? $count_approved : (isset($total_approved) ? $total_approved : 0); 
+                            ?>
+                        </div>
+                        <div class="card-label">Approved</div>
                     </div>
                 </a>
             </div>

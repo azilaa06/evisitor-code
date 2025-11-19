@@ -8,7 +8,14 @@ class Manajemen_model extends CI_Model
         parent::__construct();
     }
 
-    // Ambil semua data kunjungan dengan join ke tabel users
+    // ========================================
+    // 🔹 AMBIL DATA KUNJUNGAN
+    // ========================================
+    
+    /**
+     * Ambil semua data kunjungan dengan join ke tabel users
+     * GABUNGAN: Fitur dari MAIN (join 2 tabel) + TIA (status_label)
+     */
     public function get_all()
     {
         $this->db->select('
@@ -29,10 +36,33 @@ class Manajemen_model extends CI_Model
         $this->db->join('users u1', 'visits.handled_by = u1.user_id', 'left');
         $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
         $this->db->order_by('visits.scheduled_date', 'DESC');
-        return $this->db->get()->result_array();
+
+        $data = $this->db->get()->result_array();
+
+        // Tambahkan label status berdasarkan tanggal kunjungan (dari branch MAIN)
+        foreach ($data as &$row) {
+            if ($row['status'] == 'approved') {
+                $tanggal = date('Y-m-d', strtotime($row['TANGGAL']));
+                $hariIni = date('Y-m-d');
+                
+                if ($tanggal == $hariIni) {
+                    $row['status_label'] = 'Berkunjung';
+                } elseif ($tanggal < $hariIni) {
+                    $row['status_label'] = 'Telah Berkunjung';
+                } else {
+                    $row['status_label'] = 'Approved';
+                }
+            } else {
+                $row['status_label'] = ucfirst($row['status']);
+            }
+        }
+        
+        return $data;
     }
 
-    // Ambil data kunjungan berdasarkan status
+    /**
+     * Ambil data kunjungan berdasarkan status
+     */
     public function get_by_status($status)
     {
         $status_map = [
@@ -66,7 +96,10 @@ class Manajemen_model extends CI_Model
         return $this->db->get()->result_array();
     }
 
-    // Ambil pengunjung hari ini
+    /**
+     * Ambil pengunjung hari ini
+     * GABUNGAN: Versi final dari TIA + MAIN (lebih lengkap dan aman)
+     */
     public function get_today_visitors()
     {
         $today = date('Y-m-d');
@@ -89,16 +122,57 @@ class Manajemen_model extends CI_Model
         $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
         $this->db->where('DATE(visits.scheduled_date)', $today);
         $this->db->order_by('visits.scheduled_date', 'DESC');
-        return $this->db->get()->result_array();
+
+        $data = $this->db->get()->result_array();
+
+        // Tambahkan label status dan kondisi checkout (dari branch MAIN)
+        foreach ($data as &$row) {
+            if (empty($row['check_out'])) {
+                $row['status_label'] = 'Sedang Berkunjung';
+            } else {
+                $row['status_label'] = 'Telah Selesai';
+            }
+        }
+        
+        return $data;
     }
 
-    // Hitung total berdasarkan status
+    // ========================================
+    // 🔹 HITUNG DATA (COUNT)
+    // ========================================
+    
+    /**
+     * Hitung total berdasarkan status
+     */
     public function count_by_status($status)
     {
         return $this->db->where('status', $status)->count_all_results('visits');
     }
 
-    // Hitung pengunjung hari ini
+    /**
+     * Hitung pengunjung yang sedang berkunjung (check_in sudah, tapi check_out belum)
+     * FITUR DARI BRANCH MAIN
+     */
+    public function get_count_sedang_berkunjung()
+    {
+        $this->db->where('check_in IS NOT NULL', null, false);
+        $this->db->where('check_out IS NULL', null, false);
+        return $this->db->count_all_results('visits');
+    }
+
+    /**
+     * Hitung pengunjung yang telah berkunjung (sudah checkout)
+     * FITUR DARI BRANCH MAIN
+     */
+    public function get_count_telah_berkunjung()
+    {
+        $this->db->where('check_out IS NOT NULL', null, false);
+        return $this->db->count_all_results('visits');
+    }
+
+    /**
+     * Hitung pengunjung hari ini
+     */
     public function count_today_visitors()
     {
         $today = date('Y-m-d');
@@ -106,7 +180,13 @@ class Manajemen_model extends CI_Model
         return $this->db->count_all_results('visits');
     }
 
-    // Ambil detail kunjungan berdasarkan ID
+    // ========================================
+    // 🔹 DETAIL & UPDATE KUNJUNGAN
+    // ========================================
+    
+    /**
+     * Ambil detail kunjungan berdasarkan ID
+     */
     public function get_by_id($visit_id)
     {
         $this->db->select('
@@ -127,7 +207,9 @@ class Manajemen_model extends CI_Model
         return $this->db->get()->row_array();
     }
 
-    // Update status kunjungan
+    /**
+     * Update status kunjungan
+     */
     public function update_status($visit_id, $status, $user_id = null)
     {
         $data = [
@@ -143,7 +225,9 @@ class Manajemen_model extends CI_Model
         return $this->db->update('visits', $data);
     }
 
-    // Update check in
+    /**
+     * Update check in
+     */
     public function check_in($visit_id)
     {
         $data = [
@@ -154,7 +238,9 @@ class Manajemen_model extends CI_Model
         return $this->db->update('visits', $data);
     }
 
-    // Update check out
+    /**
+     * Update check out
+     */
     public function check_out($visit_id)
     {
         $data = [
@@ -165,7 +251,14 @@ class Manajemen_model extends CI_Model
         return $this->db->update('visits', $data);
     }
 
-    // Search kunjungan (SUDAH DIPERBAIKI - ADA JOIN)
+    // ========================================
+    // 🔹 SEARCH & DELETE
+    // ========================================
+    
+    /**
+     * Search kunjungan
+     * GABUNGAN: Join dari MAIN + search logic
+     */
     public function search($keyword = null)
     {
         $this->db->select('
@@ -196,4 +289,25 @@ class Manajemen_model extends CI_Model
         $this->db->order_by('visits.scheduled_date', 'DESC');
         return $this->db->get()->result_array();
     }
+
+    /**
+     * Hapus data pengunjung
+     * FITUR DARI BRANCH MAIN
+     */
+    public function delete_visitor($id)
+    {
+        $this->db->where('visit_id', $id);
+        return $this->db->delete('visits');
+    }
+
+    /**
+     * Ambil semua data visits (untuk tombol kembali)
+     * FITUR DARI BRANCH MAIN
+     */
+    public function get_all_visits()
+    {
+        $query = $this->db->get('visits');
+        return $query->result_array();
+    }
 }
+?>

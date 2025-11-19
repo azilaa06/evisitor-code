@@ -13,6 +13,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    <!-- SweetAlert CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         /* Body umum */
         body {
@@ -261,6 +264,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            text-decoration: none;
         }
 
         .action-button:hover {
@@ -327,12 +331,121 @@
             display: table;
             clear: both;
         }
+
+        /* Modal Scanner Styles */
+        .modal-scan {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-content-scan {
+            background: #fff;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-content-scan h3 {
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+
+        .scan-instruction {
+            color: #64748b;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        #preview {
+            width: 100%;
+            height: 300px;
+            border: 2px dashed #3b82f6;
+            border-radius: 12px;
+            margin: 15px 0;
+            background-color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #preview::before {
+            content: "🔄 Memuat Kamera...";
+            position: absolute;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        #preview video {
+            border-radius: 12px;
+        }
+
+        .camera-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+
+        .camera-placeholder i {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .close-scan-btn {
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-scan-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
 <body>
-
     <?php $this->load->view('Layouts/sidebar_admin'); ?>
+
+    <!-- 🔔 Notifikasi sukses setelah penghapusan (FITUR DARI MAIN) -->
+    <?php if ($this->session->flashdata('success')): ?>
+        <div id="alert-success" style="background-color:#d4edda; color:#155724; border:1px solid #c3e6cb; padding:10px; border-radius:5px; margin:20px 280px 0 280px; text-align:center;">
+            <?= $this->session->flashdata('success'); ?>
+        </div>
+
+        <script>
+            // Hilangkan notifikasi otomatis setelah 3 detik
+            setTimeout(() => {
+                const alertBox = document.getElementById('alert-success');
+                if (alertBox) alertBox.style.display = 'none';
+            }, 3000);
+        </script>
+    <?php endif; ?>
 
     <main class="main-content">
         <header class="top-header">
@@ -345,222 +458,298 @@
             </div>
         </header>
 
-
-        <form action="<?= base_url('index.php/manajemen_kunjungan/'); ?>" method="get" class="search-filter-bar">
-            <div class="data-management-section">
-                <div class="search-filter-bar">
-                    <div class="search-input-group">
-                        <i class="fas fa-search"></i>
-                        <input
-                            type="text"
-                            name="keyword"
-                            placeholder="Cari nama, NIK, atau instansi..."
-                            value="<?= isset($keyword) ? htmlspecialchars($keyword) : ''; ?>">
-                    </div>
-                    <button class="submit" class="filter-button">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
+        <div class="data-management-section">
+            <!-- Search & Filter -->
+            <form action="<?= base_url('index.php/manajemen_kunjungan/data'); ?>" method="get" class="search-filter-bar">
+                <div class="search-input-group">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="keyword" placeholder="Cari nama, NIK, atau instansi..." value="<?= isset($keyword) ? htmlspecialchars($keyword) : ''; ?>">
                 </div>
+                <button type="submit" class="filter-button">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </form>
 
-                <div class="data-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Nama</th>
-                                <th>NIK</th>
-                                <th>Tanggal</th>
-                                <th>Instansi</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (!empty($kunjungan)): ?>
-                                <?php $no = 1;
-                                foreach ($kunjungan as $row): ?>
-                                    <tr>
-                                        <td><?= $no++; ?></td>
-                                        <td><?= htmlspecialchars($row['NAMA']); ?></td>
-                                        <td><?= htmlspecialchars($row['NIK']); ?></td>
-                                        <td><?= date('d/m/Y', strtotime($row['TANGGAL'])); ?></td>
-                                        <td><?= htmlspecialchars($row['INSTANSI']); ?></td>
-                                        <td>
-                                            <?php
-                                            $status_class = '';
-                                            $status_text = '';
-                                            switch ($row['status']) {
-                                                case 'pending':
-                                                    $status_class = 'pending';
-                                                    $status_text = 'Menunggu';
-                                                    break;
-                                                case 'approved':
-                                                    $status_class = 'berkunjung';
-                                                    $status_text = 'Berkunjung';
-                                                    break;
-                                                case 'rejected':
-                                                    $status_class = 'reject';
-                                                    $status_text = 'Ditolak';
-                                                    break;
-                                                case 'completed':
-                                                    $status_class = 'selesai';
-                                                    $status_text = 'Selesai';
-                                                    break;
-                                                default:
-                                                    $status_class = 'pending';
-                                                    $status_text = ucfirst($row['status']);
-                                            }
-                                            ?>
-                                            <span class="status-badge <?= $status_class; ?>">
-                                                <?= $status_text; ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <!-- mengirimkan visit_id dari setiap baris ke fungsi detail di controller Manajemen_kunjungan. -->
-                                            <a href="<?= base_url('index.php/detail_kunjungan/detail/' . $row['visit_id']); ?>" class="action-button">
-                                                <i class="fas fa-eye"></i> Details
-
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+            <!-- Table -->
+            <div class="data-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>NIK</th>
+                            <th>Tanggal</th>
+                            <th>Instansi</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($kunjungan)): ?>
+                            <?php $no = 1; foreach ($kunjungan as $row): ?>
                                 <tr>
-                                    <td colspan="7">
-                                        <div class="empty-state">
-                                            <i class="fas fa-inbox"></i>
-                                            <p>Belum ada data kunjungan</p>
-                                        </div>
+                                    <td><?= $no++; ?></td>
+                                    <td><?= htmlspecialchars($row['NAMA']); ?></td>
+                                    <td><?= htmlspecialchars($row['NIK']); ?></td>
+                                    <td><?= date('d/m/Y', strtotime($row['TANGGAL'])); ?></td>
+                                    <td><?= htmlspecialchars($row['INSTANSI']); ?></td>
+                                    <td>
+                                        <?php
+                                        // GABUNGAN: Status logic dari TIA + MAIN
+                                        $status_class = '';
+                                        $status_text = '';
+                                        switch ($row['status']) {
+                                            case 'pending':
+                                                $status_class = 'pending';
+                                                $status_text = 'Menunggu';
+                                                break;
+                                            case 'approved':
+                                                $status_class = 'berkunjung';
+                                                $status_text = 'Berkunjung';
+                                                break;
+                                            case 'rejected':
+                                                $status_class = 'reject';
+                                                $status_text = 'Ditolak';
+                                                break;
+                                            case 'completed':
+                                                $status_class = 'selesai';
+                                                $status_text = 'Selesai';
+                                                break;
+                                            default:
+                                                $status_class = 'pending';
+                                                $status_text = ucfirst($row['status']);
+                                        }
+                                        ?>
+                                        <span class="status-badge <?= $status_class; ?>">
+                                            <?= $status_text; ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="<?= base_url('index.php/detail_kunjungan/detail/' . $row['visit_id']); ?>" class="action-button">
+                                            <i class="fas fa-eye"></i> Details
+                                        </a>
                                     </td>
                                 </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>Belum ada data kunjungan</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
 
-                <script>
-                    const searchInput = document.querySelector('input[name="keyword"]');
-                    searchInput.addEventListener('input', function() {
-                        if (this.value.trim() === '') {
-                            // Kalau input kosong, reload halaman biar semua data muncul lagi
-                            window.location.href = "<?= base_url('index.php/manajemen_kunjungan/'); ?>";
-                        }
-                    });
-                </script>
+            <!-- Scan QR Button -->
+            <div class="clearfix">
+                <button id="scanButton" type="button" class="scan-qr-button">
+                    <i class="fas fa-qrcode"></i> Scan QR Code
+                </button>
+            </div>
+        </div>
 
+        <!-- Modal Scanner (FITUR DARI MAIN - Lebih Lengkap) -->
+        <div id="qrModal" class="modal-scan">
+            <div class="modal-content-scan">
+                <h3>Scan QR Code Pengunjung</h3>
+                <p class="scan-instruction">Arahkan kamera ke QR Code untuk memindai</p>
+                <div id="preview"></div>
+                <button id="closeModal" class="close-scan-btn">
+                    <i class="fas fa-times"></i> Tutup Scanner
+                </button>
+            </div>
+        </div>
+    </main>
 
-                <!-- Tambahkan di bawah tombol Details (bagian HTML kamu yang ada tombol QR) -->
-                <div class="clearfix">
-                    <button id="scanButton" type="button" class="scan-qr-button">
-                        <i class="fas fa-qrcode"></i> Scan QR Code
-                    </button>
-                </div>
+    <!-- LOAD LIBRARY HANYA SATU KALI DI BODY -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
-                <!-- Modal untuk scanner -->
-                <div id="qrModal" class="modal-scan" style="display:none;">
-                    <div class="modal-content-scan">
-                        <div id="preview" style="width: 300px; height: 300px;"></div>
-                        <button id="closeModal" class="close-scan-btn">Tutup</button>
-                    </div>
-                </div>
+    <script>
+        // QR Code Scanner Functionality (GABUNGAN VERSI TIA + MAIN)
+        const scanButton = document.getElementById('scanButton');
+        const modal = document.getElementById('qrModal');
+        const closeModal = document.getElementById('closeModal');
+        let html5QrCode = null;
 
-                <!-- Library SweetAlert -->
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        scanButton.addEventListener('click', async () => {
+            try {
+                // Tampilkan loading
+                Swal.fire({
+                    title: "Mengaktifkan Kamera...",
+                    text: "Mohon tunggu sebentar",
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
 
-                <!-- Library QR Code -->
-                <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+                // Tampilkan modal
+                modal.style.display = 'flex';
 
-                <script>
-                    const scanButton = document.getElementById('scanButton');
-                    const modal = document.getElementById('qrModal');
-                    const closeModal = document.getElementById('closeModal');
-                    let html5QrCode;
+                // Inisialisasi scanner
+                html5QrCode = new Html5Qrcode("preview");
 
-                    // Klik tombol scan
-                    scanButton.addEventListener('click', () => {
+                // Konfigurasi camera
+                const config = {
+                    fps: 10,
+                    qrbox: {
+                        width: 250,
+                        height: 250
+                    },
+                    aspectRatio: 1.0,
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: true
+                    }
+                };
+
+                // Tutup SweetAlert loading
+                Swal.close();
+
+                // Coba dengan berbagai konfigurasi kamera (DARI MAIN)
+                try {
+                    await html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure);
+                } catch (environmentError) {
+                    console.log("Kamera belakang tidak tersedia, coba kamera depan:", environmentError);
+                    await html5QrCode.start({facingMode: "user"}, config, onScanSuccess, onScanFailure);
+                }
+
+            } catch (err) {
+                console.error("Error starting scanner:", err);
+                modal.style.display = 'none';
+
+                // Error handling yang lebih spesifik (DARI MAIN)
+                let errorMessage = 'Pastikan Anda memberikan izin akses kamera dan perangkat Anda mendukung.';
+
+                if (err.name === 'NotAllowedError') {
+                    errorMessage = 'Izin akses kamera ditolak. Silakan izinkan akses kamera di pengaturan browser Anda.';
+                } else if (err.name === 'NotFoundError') {
+                    errorMessage = 'Tidak ada kamera yang ditemukan di perangkat Anda.';
+                } else if (err.name === 'NotSupportedError') {
+                    errorMessage = 'Browser Anda tidak mendukung akses kamera. Coba gunakan browser lain seperti Chrome atau Firefox.';
+                } else if (err.name === 'NotReadableError') {
+                    errorMessage = 'Kamera sedang digunakan oleh aplikasi lain. Tutup aplikasi lain yang mungkin menggunakan kamera.';
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kamera Tidak Dapat Diakses',
+                    text: errorMessage,
+                    confirmButtonText: 'Mengerti'
+                });
+            }
+        });
+
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log("QR Code scanned:", decodedText);
+
+            html5QrCode.stop().then(() => {
+                modal.style.display = 'none';
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'QR Code Berhasil Di-scan!',
+                    html: `Data: <strong>${decodedText}</strong>`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Proses Check-In',
+                    cancelButtonText: 'Scan Lagi',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return processCheckIn(decodedText);
+                    }
+                }).then((result) => {
+                    if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+                        setTimeout(() => scanButton.click(), 500);
+                    }
+                });
+            }).catch(err => {
+                console.error("Error stopping scanner:", err);
+            });
+        }
+
+        function onScanFailure(error) {
+            // Error handling untuk scanning (tidak perlu alert terus-menerus)
+            if (error && !error.toString().includes('NotFoundException')) {
+                console.log("Scan error (biasanya normal):", error);
+            }
+        }
+
+        function processCheckIn(qrData) {
+            return fetch('<?= base_url('index.php/scan/process_checkin'); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `qr_data=${encodeURIComponent(qrData)}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
                         Swal.fire({
-                            title: "Mengaktifkan Kamera...",
-                            text: "Tunggu sebentar ya",
-                            allowOutsideClick: false,
-                            didOpen: () => Swal.showLoading()
+                            icon: 'success',
+                            title: 'Check-In Berhasil!',
+                            text: data.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
                         });
-
-                        modal.style.display = 'flex';
-                        html5QrCode = new Html5Qrcode("preview");
-                        html5QrCode.start({
-                                facingMode: "environment"
-                            }, {
-                                fps: 10,
-                                qrbox: 250
-                            },
-                            qrCodeMessage => {
-                                html5QrCode.stop().then(() => {
-                                    modal.style.display = 'none';
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Scan Berhasil!',
-                                        text: 'QR Code terbaca dengan benar ✅',
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    });
-                                    // Contoh redirect (opsional):
-                                    // window.location.href 
-                                });
-                            },
-                            errorMessage => {
-                                console.log("Scanning...", errorMessage);
-                            }
-                        ).catch(err => {
-                            console.error("Gagal membuka kamera:", err);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Kamera Gagal Dibuka',
-                                text: 'Pastikan izin kamera diizinkan.'
-                            });
-                        });
+                        return data;
+                    } else {
+                        throw new Error(data.message || 'Terjadi kesalahan saat proses check-in');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Check-In Gagal',
+                        text: error.message || 'Terjadi kesalahan, silakan coba lagi'
                     });
+                    throw error;
+                });
+        }
 
-                    // Tutup modal
-                    closeModal.addEventListener('click', () => {
-                        if (html5QrCode) html5QrCode.stop();
+        // Tutup modal
+        closeModal.addEventListener('click', () => {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    modal.style.display = 'none';
+                }).catch(err => {
+                    console.error("Error stopping scanner:", err);
+                    modal.style.display = 'none';
+                });
+            } else {
+                modal.style.display = 'none';
+            }
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                if (html5QrCode && html5QrCode.isScanning) {
+                    html5QrCode.stop().then(() => {
                         modal.style.display = 'none';
                     });
-                </script>
+                } else {
+                    modal.style.display = 'none';
+                }
+            }
+        });
 
-                <style>
-                    /* Modal scanner */
-                    .modal-scan {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-color: rgba(0, 0, 0, 0.6);
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        z-index: 9999;
-                    }
+        // Search functionality (DARI TIA)
+        const searchInput = document.querySelector('input[name="keyword"]');
+        searchInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                window.location.href = "<?= base_url('index.php/manajemen_kunjungan/data'); ?>";
+            }
+        });
+    </script>
 
-                    .modal-content-scan {
-                        background: #fff;
-                        padding: 20px;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-                        text-align: center;
-                        width: 320px;
-                    }
-
-                    .close-scan-btn {
-                        background: #ef4444;
-                        color: #fff;
-                        border: none;
-                        padding: 8px 14px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        margin-top: 10px;
-                    }
-
-                    .close-scan-btn:hover {
-                        background: #dc2626;
-                    }
-                </style>
+</body>
+</html>
