@@ -1,6 +1,10 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+/**
+ * Model Manajemen Kunjungan
+ * FINAL VERSION - Merge MAIN + TIA (Clean, No Conflict)
+ */
 class Manajemen_model extends CI_Model
 {
     public function __construct()
@@ -14,7 +18,7 @@ class Manajemen_model extends CI_Model
     
     /**
      * Ambil semua data kunjungan dengan join ke tabel users
-     * GABUNGAN: Fitur dari MAIN (join 2 tabel) + TIA (status_label)
+     * GABUNGAN: Fitur dari MAIN (join) + TIA (status_label)
      */
     public function get_all()
     {
@@ -39,7 +43,7 @@ class Manajemen_model extends CI_Model
 
         $data = $this->db->get()->result_array();
 
-        // Tambahkan label status berdasarkan tanggal kunjungan (dari branch MAIN)
+        // Tambahkan label status berdasarkan tanggal kunjungan (DARI MAIN)
         foreach ($data as &$row) {
             if ($row['status'] == 'approved') {
                 $tanggal = date('Y-m-d', strtotime($row['TANGGAL']));
@@ -98,7 +102,7 @@ class Manajemen_model extends CI_Model
 
     /**
      * Ambil pengunjung hari ini
-     * GABUNGAN: Versi final dari TIA + MAIN (lebih lengkap dan aman)
+     * GABUNGAN: Versi final dari TIA + MAIN
      */
     public function get_today_visitors()
     {
@@ -125,7 +129,7 @@ class Manajemen_model extends CI_Model
 
         $data = $this->db->get()->result_array();
 
-        // Tambahkan label status dan kondisi checkout (dari branch MAIN)
+        // Tambahkan label status dan kondisi checkout (DARI MAIN)
         foreach ($data as &$row) {
             if (empty($row['check_out'])) {
                 $row['status_label'] = 'Sedang Berkunjung';
@@ -150,8 +154,7 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Hitung pengunjung yang sedang berkunjung (check_in sudah, tapi check_out belum)
-     * FITUR DARI BRANCH MAIN
+     * Hitung pengunjung yang sedang berkunjung (DARI MAIN)
      */
     public function get_count_sedang_berkunjung()
     {
@@ -161,8 +164,7 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Hitung pengunjung yang telah berkunjung (sudah checkout)
-     * FITUR DARI BRANCH MAIN
+     * Hitung pengunjung yang telah berkunjung (DARI MAIN)
      */
     public function get_count_telah_berkunjung()
     {
@@ -257,7 +259,7 @@ class Manajemen_model extends CI_Model
     
     /**
      * Search kunjungan
-     * GABUNGAN: Join dari MAIN + search logic
+     * GABUNGAN: Join dari MAIN + search logic dari TIA
      */
     public function search($keyword = null)
     {
@@ -291,8 +293,7 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Hapus data pengunjung
-     * FITUR DARI BRANCH MAIN
+     * Hapus data pengunjung (DARI MAIN)
      */
     public function delete_visitor($id)
     {
@@ -301,8 +302,7 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Ambil semua data visits (untuk tombol kembali)
-     * FITUR DARI BRANCH MAIN
+     * Ambil semua data visits (DARI MAIN)
      */
     public function get_all_visits()
     {
@@ -310,4 +310,3 @@ class Manajemen_model extends CI_Model
         return $query->result_array();
     }
 }
-?>

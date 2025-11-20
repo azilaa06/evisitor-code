@@ -24,7 +24,7 @@
             </a>
         </li>
         <li class="menu-item <?= ($active_page ?? '') == 'manajemen_data' ? 'active' : ''; ?>">
-            <a href="<?= base_url('index.php/manajemen_kunjungan'); ?>">
+            <a href="<?= base_url('manajemen_kunjungan'); ?>">
                 <i class="fas fa-database"></i> Manajemen Data
             </a>
         </li>

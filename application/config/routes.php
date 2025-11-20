@@ -3,98 +3,103 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
-| URI ROUTING
+| URI ROUTING - FIXED VERSION
+| Konsep dari MAIN, struktur lebih clean dan konsisten
 | -------------------------------------------------------------------------
-| This file lets you re-map URI requests to specific controller functions.
-|
-| Typically there is a one-to-one relationship between a URL string
-| and its corresponding controller class/method. The segments in a
-| URL normally follow this pattern:
-|
-|	example.com/class/method/id/
-|
-| In some instances, however, you may want to remap this relationship
-| so that a different class/function is called than the one
-| corresponding to the URL.
-|
-| Please see the user guide for complete details:
-|
-|	https://codeigniter.com/userguide3/general/routing.html
-|
-| -------------------------------------------------------------------------
-| RESERVED ROUTES
-| -------------------------------------------------------------------------
-|
-| There are three reserved routes:
-|
-|	$route['default_controller'] = 'welcome';
-|
-| This route indicates which controller class should be loaded if the
-| URI contains no data. In the above example, the "welcome" class
-| would be loaded.
-|
-|	$route['404_override'] = 'errors/page_missing';
-|
-| This route will tell the Router which controller/method to use if those
-| provided in the URL cannot be matched to a valid route.
-|
-|	$route['translate_uri_dashes'] = FALSE;
-|
-| This is not exactly a route, but allows you to automatically route
-| controller and method names that contain dashes. '-' isn't a valid
-| class or method name character, so it requires translation.
-| When you set this option to TRUE, it will replace ALL dashes in the
-| controller and method URI segments.
-|
-| Examples:	my-controller/index	-> my_controller/index
-|		my-controller/my-method	-> my_controller/my_method
 */
+
+// ========================================
+// DEFAULT ROUTES
+// ========================================
 $route['default_controller'] = 'auth';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-/* Tambahan route custom */
+// ========================================
+// AUTH & DASHBOARD
+// ========================================
 $route['dashboard_admin'] = 'auth/dashboard_admin';
+
+// ========================================
+// PROFIL ADMIN
+// ========================================
 $route['profil'] = 'profil_admin/profil';
 $route['profil/update'] = 'profil_admin/update';
 $route['profil/delete'] = 'profil_admin/delete_account';
 
-// HAPUS semua route manajemen_kunjungan yang konflik
-// Cukup ini aja:
-$route['admin/manajemen_data'] = 'Manajemen_kunjungan/data';
-$route['admin/manajemen_data/(:any)'] = 'Manajemen_kunjungan/data/$1';
+// ========================================
+// MANAJEMEN KUNJUNGAN (FIXED ROUTING)
+// ========================================
 
-// KUNJUNGAN
-$route['kunjungan/submit'] = 'kunjungan/submit';
+// Main route - tampilkan semua data
+$route['manajemen_kunjungan'] = 'manajemen_kunjungan/index';
+
+// Route dengan parameter status
+$route['manajemen_kunjungan/data'] = 'manajemen_kunjungan/data';
+$route['manajemen_kunjungan/data/(:any)'] = 'manajemen_kunjungan/data/$1';
+
+// Filter routes (named routes untuk UI yang lebih clean)
+$route['manajemen_kunjungan/menunggu'] = 'manajemen_kunjungan/menunggu';
+$route['manajemen_kunjungan/berkunjung'] = 'manajemen_kunjungan/berkunjung';
+$route['manajemen_kunjungan/ditolak'] = 'manajemen_kunjungan/ditolak';
+$route['manajemen_kunjungan/selesai'] = 'manajemen_kunjungan/selesai';
+$route['manajemen_kunjungan/hari_ini'] = 'manajemen_kunjungan/hari_ini';
+
+// Backward compatibility untuk route lama (dari TIA)
+$route['admin/manajemen_data'] = 'manajemen_kunjungan/index';
+$route['admin/manajemen_data/(:any)'] = 'manajemen_kunjungan/data/$1';
+
+// ========================================
+// DETAIL KUNJUNGAN
+// ========================================
+$route['detail_kunjungan/detail/(:num)'] = 'detail_kunjungan/detail/$1';
 $route['kunjungan/detail/(:num)'] = 'detail_kunjungan/detail/$1';
+
+// ========================================
+// FORM KUNJUNGAN (PUBLIC)
+// ========================================
+$route['kunjungan'] = 'kunjungan/index';
+$route['kunjungan/submit'] = 'kunjungan/submit';
+
+// ========================================
+// DAFTAR KUNJUNGAN (USER VIEW)
+// ========================================
+$route['daftar_kunjungan'] = 'daftar_kunjungan/index';
+$route['daftar_kunjungan/detail/(:num)'] = 'daftar_kunjungan/detail/$1';
+
+// Alias untuk backward compatibility
+$route['kunjungan/daftar_kunjungan'] = 'daftar_kunjungan/index';
+$route['kunjungan/daftar_kunjungan/detail/(:num)'] = 'daftar_kunjungan/detail/$1';
+
+// ========================================
+// TAMU (VISITOR VIEW)
+// ========================================
+$route['tamu'] = 'tamu/index';
 $route['tamu/kunjungan_detail/(:num)'] = 'tamu/kunjungan_detail/$1';
 
+// ========================================
+// QR CODE MANAGEMENT
+// ========================================
 
-
-// Route untuk Daftar Kunjungan
-$route['kunjungan/daftar_kunjungan'] = 'Daftar_kunjungan/index';
-$route['kunjungan/daftar_kunjungan/detail/(:num)'] = 'Daftar_kunjungan/detail/$1';
+// Main QR Code management page
+$route['qr_code'] = 'qr_code/index';
 
 // Generate QR Code setelah approve
 $route['qr_code/generate/(:num)'] = 'qr_code/generate/$1';
 
-// View QR Code untuk visitor (dengan sidebar - admin)
+// View QR Code untuk admin (dengan sidebar)
 $route['qr_code/view/(:num)'] = 'qr_code/view/$1';
 
-// View QR Code by token (tanpa sidebar - public untuk visitor)
+// View QR Code by token (public - tanpa sidebar untuk visitor)
 $route['qr_code/token/(:any)'] = 'qr_code/view_by_token/$1';
 
-// Scan QR Code page
+// Scan QR Code page & process
 $route['qr_code/scan'] = 'qr_code/scan';
+$route['scan/process_checkin'] = 'scan/process_checkin'; // AJAX endpoint
 
-// Check-in process (AJAX)
+// Check-in & Check-out process
 $route['qr_code/checkin'] = 'qr_code/checkin';
-
-// Check-out process
 $route['qr_code/checkout/(:num)'] = 'qr_code/checkout/$1';
 
 // Active visitors list (yang sedang check-in)
 $route['qr_code/active'] = 'qr_code/active';
-
-// Main QR Code management page
-$route['qr_code'] = 'qr_code/index';
