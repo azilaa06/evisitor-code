@@ -247,7 +247,8 @@ class Kunjungan_model extends CI_Model
     public function check_out($visit_id)
     {
         $data = [
-            'check_out_time' => date('Y-m-d H:i:s')
+            'check_out_time' => date('Y-m-d H:i:s'),
+            'status' => 'completed'
         ];
         
         $this->db->where('visit_id', $visit_id);
