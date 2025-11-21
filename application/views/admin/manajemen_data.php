@@ -432,14 +432,13 @@
 <body>
     <?php $this->load->view('Layouts/sidebar_admin'); ?>
 
-    <!-- 🔔 Notifikasi sukses setelah penghapusan (FITUR DARI MAIN) -->
+    <!-- Notifikasi sukses -->
     <?php if ($this->session->flashdata('success')): ?>
         <div id="alert-success" style="background-color:#d4edda; color:#155724; border:1px solid #c3e6cb; padding:10px; border-radius:5px; margin:20px 280px 0 280px; text-align:center;">
             <?= $this->session->flashdata('success'); ?>
         </div>
 
         <script>
-            // Hilangkan notifikasi otomatis setelah 3 detik
             setTimeout(() => {
                 const alertBox = document.getElementById('alert-success');
                 if (alertBox) alertBox.style.display = 'none';
@@ -495,7 +494,6 @@
                                     <td><?= htmlspecialchars($row['INSTANSI']); ?></td>
                                     <td>
                                         <?php
-                                        // GABUNGAN: Status logic dari TIA + MAIN
                                         $status_class = '';
                                         $status_text = '';
                                         switch ($row['status']) {
@@ -553,7 +551,7 @@
             </div>
         </div>
 
-        <!-- Modal Scanner (FITUR DARI MAIN - Lebih Lengkap) -->
+        <!-- Modal Scanner -->
         <div id="qrModal" class="modal-scan">
             <div class="modal-content-scan">
                 <h3>Scan QR Code Pengunjung</h3>
@@ -566,189 +564,266 @@
         </div>
     </main>
 
-    <!-- LOAD LIBRARY HANYA SATU KALI DI BODY -->
+    <!-- QR Code Scanner Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
     <script>
-        // QR Code Scanner Functionality (GABUNGAN VERSI TIA + MAIN)
-        const scanButton = document.getElementById('scanButton');
-        const modal = document.getElementById('qrModal');
-        const closeModal = document.getElementById('closeModal');
-        let html5QrCode = null;
+const scanButton = document.getElementById('scanButton');
+const modal = document.getElementById('qrModal');
+const closeModal = document.getElementById('closeModal');
+let html5QrCode = null;
 
-        scanButton.addEventListener('click', async () => {
-            try {
-                // Tampilkan loading
-                Swal.fire({
-                    title: "Mengaktifkan Kamera...",
-                    text: "Mohon tunggu sebentar",
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                // Tampilkan modal
-                modal.style.display = 'flex';
-
-                // Inisialisasi scanner
-                html5QrCode = new Html5Qrcode("preview");
-
-                // Konfigurasi camera
-                const config = {
-                    fps: 10,
-                    qrbox: {
-                        width: 250,
-                        height: 250
-                    },
-                    aspectRatio: 1.0,
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
-                    }
-                };
-
-                // Tutup SweetAlert loading
-                Swal.close();
-
-                // Coba dengan berbagai konfigurasi kamera (DARI MAIN)
-                try {
-                    await html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure);
-                } catch (environmentError) {
-                    console.log("Kamera belakang tidak tersedia, coba kamera depan:", environmentError);
-                    await html5QrCode.start({facingMode: "user"}, config, onScanSuccess, onScanFailure);
-                }
-
-            } catch (err) {
-                console.error("Error starting scanner:", err);
-                modal.style.display = 'none';
-
-                // Error handling yang lebih spesifik (DARI MAIN)
-                let errorMessage = 'Pastikan Anda memberikan izin akses kamera dan perangkat Anda mendukung.';
-
-                if (err.name === 'NotAllowedError') {
-                    errorMessage = 'Izin akses kamera ditolak. Silakan izinkan akses kamera di pengaturan browser Anda.';
-                } else if (err.name === 'NotFoundError') {
-                    errorMessage = 'Tidak ada kamera yang ditemukan di perangkat Anda.';
-                } else if (err.name === 'NotSupportedError') {
-                    errorMessage = 'Browser Anda tidak mendukung akses kamera. Coba gunakan browser lain seperti Chrome atau Firefox.';
-                } else if (err.name === 'NotReadableError') {
-                    errorMessage = 'Kamera sedang digunakan oleh aplikasi lain. Tutup aplikasi lain yang mungkin menggunakan kamera.';
-                }
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Kamera Tidak Dapat Diakses',
-                    text: errorMessage,
-                    confirmButtonText: 'Mengerti'
-                });
-            }
+scanButton.addEventListener('click', async () => {
+    try {
+        Swal.fire({
+            title: "Mengaktifkan Kamera...",
+            text: "Mohon tunggu sebentar",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
         });
 
-        function onScanSuccess(decodedText, decodedResult) {
-            console.log("QR Code scanned:", decodedText);
+        modal.style.display = 'flex';
+        html5QrCode = new Html5Qrcode("preview");
 
-            html5QrCode.stop().then(() => {
-                modal.style.display = 'none';
+        const config = {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+            experimentalFeatures: {
+                useBarCodeDetectorIfSupported: true
+            }
+        };
 
+        Swal.close();
+
+        try {
+            await html5QrCode.start({facingMode: "environment"}, config, onScanSuccess, onScanFailure);
+        } catch (environmentError) {
+            console.log("Kamera belakang tidak tersedia, coba kamera depan:", environmentError);
+            await html5QrCode.start({facingMode: "user"}, config, onScanSuccess, onScanFailure);
+        }
+
+    } catch (err) {
+        console.error("Error starting scanner:", err);
+        modal.style.display = 'none';
+
+        let errorMessage = 'Pastikan Anda memberikan izin akses kamera dan perangkat Anda mendukung.';
+
+        if (err.name === 'NotAllowedError') {
+            errorMessage = 'Izin akses kamera ditolak. Silakan izinkan akses kamera di pengaturan browser Anda.';
+        } else if (err.name === 'NotFoundError') {
+            errorMessage = 'Tidak ada kamera yang ditemukan di perangkat Anda.';
+        } else if (err.name === 'NotSupportedError') {
+            errorMessage = 'Browser Anda tidak mendukung akses kamera. Coba gunakan browser lain seperti Chrome atau Firefox.';
+        } else if (err.name === 'NotReadableError') {
+            errorMessage = 'Kamera sedang digunakan oleh aplikasi lain. Tutup aplikasi lain yang mungkin menggunakan kamera.';
+        }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Kamera Tidak Dapat Diakses',
+            text: errorMessage,
+            confirmButtonText: 'Mengerti'
+        });
+    }
+});
+
+function onScanSuccess(decodedText, decodedResult) {
+    console.log("QR Code scanned:", decodedText);
+
+    html5QrCode.stop().then(() => {
+        modal.style.display = 'none';
+
+        Swal.fire({
+            icon: 'success',
+            title: 'QR Code Berhasil Di-scan!',
+            html: `Data: <strong>${decodedText}</strong>`,
+            showCancelButton: true,
+            confirmButtonText: 'Proses Check-In',
+            cancelButtonText: 'Scan Lagi',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return processCheckIn(decodedText);
+            }
+        }).then((result) => {
+            if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+                setTimeout(() => scanButton.click(), 500);
+            }
+        });
+    }).catch(err => {
+        console.error("Error stopping scanner:", err);
+    });
+}
+
+function onScanFailure(error) {
+    if (error && !error.toString().includes('NotFoundException')) {
+        console.log("Scan error (biasanya normal):", error);
+    }
+}
+
+// ✅ FIXED: Process Check-In dengan error handling lengkap
+function processCheckIn(qrData) {
+    console.log('=== PROCESS CHECK-IN START ===');
+    console.log('QR Token:', qrData);
+    
+    // Validasi input
+    if (!qrData || qrData.trim() === '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'QR Token kosong'
+        });
+        return Promise.reject('QR Token kosong');
+    }
+    
+    const endpoint = '<?= base_url('index.php/qr_code/checkin'); ?>';
+    console.log('Endpoint:', endpoint);
+    
+    return fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: 'qr_token=' + encodeURIComponent(qrData.trim())
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response OK:', response.ok);
+            
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error('Error response body:', text.substring(0, 500));
+                    
+                    try {
+                        const jsonData = JSON.parse(text);
+                        if (jsonData.message) {
+                            throw new Error(jsonData.message);
+                        }
+                    } catch (e) {
+                        // Bukan JSON
+                    }
+                    
+                    throw new Error(`HTTP ${response.status}: Server error`);
+                });
+            }
+            
+            const contentType = response.headers.get('content-type');
+            console.log('Content-Type:', contentType);
+            
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    console.error('Non-JSON response:', text.substring(0, 500));
+                    
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
+                    const errorTitle = doc.querySelector('h1');
+                    const errorMsg = errorTitle ? errorTitle.textContent : 'Server tidak mengembalikan JSON';
+                    
+                    throw new Error(errorMsg);
+                });
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Check-in result:', data);
+            console.log('=== PROCESS CHECK-IN END ===');
+            
+            if (data.success) {
+                const checkInDate = data.visit?.check_in ? 
+                    new Date(data.visit.check_in).toLocaleString('id-ID', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : 'Sekarang';
+                
                 Swal.fire({
                     icon: 'success',
-                    title: 'QR Code Berhasil Di-scan!',
-                    html: `Data: <strong>${decodedText}</strong>`,
-                    showCancelButton: true,
-                    confirmButtonText: 'Proses Check-In',
-                    cancelButtonText: 'Scan Lagi',
-                    showLoaderOnConfirm: true,
-                    preConfirm: () => {
-                        return processCheckIn(decodedText);
-                    }
-                }).then((result) => {
-                    if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
-                        setTimeout(() => scanButton.click(), 500);
-                    }
+                    title: 'Check-In Berhasil!',
+                    html: `
+                        <div style="text-align: left; margin: 20px 0;">
+                            <p style="margin: 10px 0;"><strong>Nama:</strong> ${data.visit?.fullname || data.visit?.visitor_fullname || data.visit?.visitor_username || 'N/A'}</p>
+                            <p style="margin: 10px 0;"><strong>NIK:</strong> ${data.visit?.id_number || 'N/A'}</p>
+                            <p style="margin: 10px 0;"><strong>Instansi:</strong> ${data.visit?.institution || 'N/A'}</p>
+                            <p style="margin: 10px 0;"><strong>Tujuan:</strong> ${data.visit?.purpose || 'N/A'}</p>
+                            <p style="margin: 10px 0;"><strong>Waktu Check-in:</strong> ${checkInDate}</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'OK',
+                    timer: 5000
+                }).then(() => {
+                    window.location.reload();
                 });
-            }).catch(err => {
-                console.error("Error stopping scanner:", err);
-            });
-        }
-
-        function onScanFailure(error) {
-            // Error handling untuk scanning (tidak perlu alert terus-menerus)
-            if (error && !error.toString().includes('NotFoundException')) {
-                console.log("Scan error (biasanya normal):", error);
-            }
-        }
-
-        function processCheckIn(qrData) {
-            return fetch('<?= base_url('index.php/scan/process_checkin'); ?>', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `qr_data=${encodeURIComponent(qrData)}`
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Check-In Berhasil!',
-                            text: data.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                        return data;
-                    } else {
-                        throw new Error(data.message || 'Terjadi kesalahan saat proses check-in');
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Check-In Gagal',
-                        text: error.message || 'Terjadi kesalahan, silakan coba lagi'
-                    });
-                    throw error;
-                });
-        }
-
-        // Tutup modal
-        closeModal.addEventListener('click', () => {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    modal.style.display = 'none';
-                }).catch(err => {
-                    console.error("Error stopping scanner:", err);
-                    modal.style.display = 'none';
-                });
+                return data;
             } else {
+                throw new Error(data.message || 'Check-in gagal');
+            }
+        })
+        .catch(error => {
+            console.error('Check-in error:', error);
+            console.error('Error stack:', error.stack);
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Check-In Gagal',
+                html: `
+                    <p style="margin-bottom: 15px;"><strong>${error.message}</strong></p>
+                    <div style="text-align: left; font-size: 14px; color: #666;">
+                        <p><strong>Kemungkinan penyebab:</strong></p>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>QR Code tidak valid atau tidak terdaftar</li>
+                            <li>Kunjungan belum disetujui (status pending/rejected)</li>
+                            <li>Visitor sudah check-in sebelumnya</li>
+                            <li>Koneksi internet bermasalah</li>
+                            <li>Server error (cek log di application/logs/)</li>
+                        </ul>
+                    </div>
+                `,
+                confirmButtonText: 'Coba Lagi',
+                footer: '<a href="javascript:void(0)" onclick="window.location.reload()">Refresh Halaman</a>'
+            });
+            throw error;
+        });
+}
+
+// Tutup modal
+closeModal.addEventListener('click', () => {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+            modal.style.display = 'none';
+        }).catch(err => {
+            console.error("Error stopping scanner:", err);
+            modal.style.display = 'none';
+        });
+    } else {
+        modal.style.display = 'none';
+    }
+});
+
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(() => {
                 modal.style.display = 'none';
-            }
-        });
+            });
+        } else {
+            modal.style.display = 'none';
+        }
+    }
+});
 
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                if (html5QrCode && html5QrCode.isScanning) {
-                    html5QrCode.stop().then(() => {
-                        modal.style.display = 'none';
-                    });
-                } else {
-                    modal.style.display = 'none';
-                }
-            }
-        });
-
-        // Search functionality (DARI TIA)
-        const searchInput = document.querySelector('input[name="keyword"]');
-        searchInput.addEventListener('input', function() {
-            if (this.value.trim() === '') {
-                window.location.href = "<?= base_url('index.php/manajemen_kunjungan/data'); ?>";
-            }
-        });
+// Search functionality
+const searchInput = document.querySelector('input[name="keyword"]');
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        if (this.value.trim() === '') {
+            window.location.href = "<?= base_url('index.php/manajemen_kunjungan/data'); ?>";
+        }
+    });
+}
     </script>
 
 </body>
