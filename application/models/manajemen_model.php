@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * Model Manajemen Kunjungan
- * FINAL VERSION - Merge MAIN + TIA (Clean, No Conflict)
+ * FIXED VERSION - Sesuai Database & Requirement
  */
 class Manajemen_model extends CI_Model
 {
@@ -18,7 +18,6 @@ class Manajemen_model extends CI_Model
     
     /**
      * Ambil semua data kunjungan dengan join ke tabel users
-     * GABUNGAN: Fitur dari MAIN (join) + TIA (status_label)
      */
     public function get_all()
     {
@@ -43,41 +42,86 @@ class Manajemen_model extends CI_Model
 
         $data = $this->db->get()->result_array();
 
-        // Tambahkan label status berdasarkan tanggal kunjungan (DARI MAIN)
+        // Tambahkan label status
         foreach ($data as &$row) {
-            if ($row['status'] == 'approved') {
-                $tanggal = date('Y-m-d', strtotime($row['TANGGAL']));
-                $hariIni = date('Y-m-d');
-                
-                if ($tanggal == $hariIni) {
-                    $row['status_label'] = 'Berkunjung';
-                } elseif ($tanggal < $hariIni) {
-                    $row['status_label'] = 'Telah Berkunjung';
-                } else {
-                    $row['status_label'] = 'Approved';
-                }
-            } else {
-                $row['status_label'] = ucfirst($row['status']);
-            }
+            $row['status_label'] = $this->get_status_label($row);
         }
         
         return $data;
     }
 
     /**
-     * Ambil data kunjungan berdasarkan status
+     * Helper: Generate label status berdasarkan kondisi
      */
-    public function get_by_status($status)
+    private function get_status_label($row)
     {
-        $status_map = [
-            'ditolak' => 'rejected',
-            'berkunjung' => 'approved',
-            'menunggu' => 'pending',
-            'selesai' => 'completed'
-        ];
+        // Jika sudah checkout
+        if (!empty($row['check_out'])) {
+            return 'Telah Berkunjung';
+        }
+        
+        // Jika sudah checkin tapi belum checkout
+        if (!empty($row['check_in']) && empty($row['check_out'])) {
+            return 'Sedang Berkunjung';
+        }
+        
+        // Jika status approved tapi belum checkin
+        if ($row['status'] == 'approved' && empty($row['check_in'])) {
+            return 'Approved';
+        }
+        
+        // Status lainnya
+        if ($row['status'] == 'pending') {
+            return 'Menunggu Approval';
+        }
+        
+        if ($row['status'] == 'rejected') {
+            return 'Ditolak';
+        }
+        
+        return ucfirst($row['status']);
+    }
 
-        $db_status = isset($status_map[strtolower($status)]) ? $status_map[strtolower($status)] : $status;
+    /**
+     * Ambil data yang statusnya REJECTED (Ditolak)
+     */
+    public function get_ditolak()
+    {
+        $this->db->select('
+            visits.visit_id,
+            visits.scheduled_date AS TANGGAL,
+            visits.check_in,
+            visits.check_out,
+            visits.status,
+            visits.qr_code,
+            visits.fullname AS NAMA,
+            visits.id_number AS NIK,
+            visits.phone,
+            visits.institution AS INSTANSI,
+            visits.rejection_reason,
+            u1.fullname AS PETUGAS,
+            u2.fullname AS PENANGGUNG_JAWAB
+        ');
+        $this->db->from('visits');
+        $this->db->join('users u1', 'visits.handled_by = u1.user_id', 'left');
+        $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
+        $this->db->where('visits.status', 'rejected');
+        $this->db->order_by('visits.scheduled_date', 'DESC');
+        
+        $data = $this->db->get()->result_array();
+        
+        foreach ($data as &$row) {
+            $row['status_label'] = 'Ditolak';
+        }
+        
+        return $data;
+    }
 
+    /**
+     * FIXED: Ambil data yang SEDANG BERKUNJUNG (sudah check_in tapi belum check_out)
+     */
+    public function get_sedang_berkunjung()
+    {
         $this->db->select('
             visits.visit_id,
             visits.scheduled_date AS TANGGAL,
@@ -95,14 +139,92 @@ class Manajemen_model extends CI_Model
         $this->db->from('visits');
         $this->db->join('users u1', 'visits.handled_by = u1.user_id', 'left');
         $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
-        $this->db->where('visits.status', $db_status);
-        $this->db->order_by('visits.scheduled_date', 'DESC');
-        return $this->db->get()->result_array();
+        $this->db->where('visits.check_in IS NOT NULL', null, false);
+        $this->db->where('visits.check_out IS NULL', null, false);
+        $this->db->order_by('visits.check_in', 'DESC');
+        
+        $data = $this->db->get()->result_array();
+        
+        foreach ($data as &$row) {
+            $row['status_label'] = 'Sedang Berkunjung';
+        }
+        
+        return $data;
     }
 
     /**
-     * Ambil pengunjung hari ini
-     * GABUNGAN: Versi final dari TIA + MAIN
+     * Ambil data yang statusnya PENDING (Menunggu Approval)
+     */
+    public function get_menunggu()
+    {
+        $this->db->select('
+            visits.visit_id,
+            visits.scheduled_date AS TANGGAL,
+            visits.check_in,
+            visits.check_out,
+            visits.status,
+            visits.qr_code,
+            visits.fullname AS NAMA,
+            visits.id_number AS NIK,
+            visits.phone,
+            visits.institution AS INSTANSI,
+            visits.purpose,
+            visits.to_whom,
+            u1.fullname AS PETUGAS,
+            u2.fullname AS PENANGGUNG_JAWAB
+        ');
+        $this->db->from('visits');
+        $this->db->join('users u1', 'visits.handled_by = u1.user_id', 'left');
+        $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
+        $this->db->where('visits.status', 'pending');
+        $this->db->order_by('visits.scheduled_date', 'DESC');
+        
+        $data = $this->db->get()->result_array();
+        
+        foreach ($data as &$row) {
+            $row['status_label'] = 'Menunggu Approval';
+        }
+        
+        return $data;
+    }
+
+    /**
+     * FIXED: Ambil data yang TELAH BERKUNJUNG (sudah check_out)
+     */
+    public function get_telah_berkunjung()
+    {
+        $this->db->select('
+            visits.visit_id,
+            visits.scheduled_date AS TANGGAL,
+            visits.check_in,
+            visits.check_out,
+            visits.status,
+            visits.qr_code,
+            visits.fullname AS NAMA,
+            visits.id_number AS NIK,
+            visits.phone,
+            visits.institution AS INSTANSI,
+            u1.fullname AS PETUGAS,
+            u2.fullname AS PENANGGUNG_JAWAB
+        ');
+        $this->db->from('visits');
+        $this->db->join('users u1', 'visits.handled_by = u1.user_id', 'left');
+        $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
+        $this->db->where('visits.check_out IS NOT NULL', null, false);
+        $this->db->order_by('visits.check_out', 'DESC');
+        
+        $data = $this->db->get()->result_array();
+        
+        foreach ($data as &$row) {
+            $row['status_label'] = 'Telah Berkunjung';
+        }
+        
+        return $data;
+    }
+
+    /**
+     * FIXED: Ambil pengunjung hari ini yang STATUSNYA APPROVED
+     * Syarat: scheduled_date = hari ini DAN status = approved
      */
     public function get_today_visitors()
     {
@@ -125,20 +247,82 @@ class Manajemen_model extends CI_Model
         $this->db->join('users u1', 'visits.handled_by = u1.user_id', 'left');
         $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
         $this->db->where('DATE(visits.scheduled_date)', $today);
+        $this->db->where('visits.status', 'approved');
         $this->db->order_by('visits.scheduled_date', 'DESC');
 
         $data = $this->db->get()->result_array();
 
-        // Tambahkan label status dan kondisi checkout (DARI MAIN)
         foreach ($data as &$row) {
-            if (empty($row['check_out'])) {
-                $row['status_label'] = 'Sedang Berkunjung';
-            } else {
-                $row['status_label'] = 'Telah Selesai';
-            }
+            $row['status_label'] = $this->get_status_label($row);
         }
         
         return $data;
+    }
+
+    /**
+     * Ambil data yang statusnya APPROVED
+     */
+    public function get_approved()
+    {
+        $this->db->select('
+            visits.visit_id,
+            visits.scheduled_date AS TANGGAL,
+            visits.check_in,
+            visits.check_out,
+            visits.status,
+            visits.qr_code,
+            visits.fullname AS NAMA,
+            visits.id_number AS NIK,
+            visits.phone,
+            visits.institution AS INSTANSI,
+            visits.approved_at,
+            u1.fullname AS PETUGAS,
+            u2.fullname AS PENANGGUNG_JAWAB
+        ');
+        $this->db->from('visits');
+        $this->db->join('users u1', 'visits.handled_by = u1.user_id', 'left');
+        $this->db->join('users u2', 'visits.approved_by = u2.user_id', 'left');
+        $this->db->where('visits.status', 'approved');
+        $this->db->order_by('visits.approved_at', 'DESC');
+        
+        $data = $this->db->get()->result_array();
+        
+        foreach ($data as &$row) {
+            $row['status_label'] = $this->get_status_label($row);
+        }
+        
+        return $data;
+    }
+
+    /**
+     * Ambil data berdasarkan status (untuk compatibility)
+     */
+    public function get_by_status($status)
+    {
+        $status_map = [
+            'ditolak' => 'rejected',
+            'menunggu' => 'pending',
+            'approved' => 'approved',
+            'berkunjung' => 'berkunjung',
+            'selesai' => 'selesai'
+        ];
+
+        $db_status = isset($status_map[strtolower($status)]) ? $status_map[strtolower($status)] : $status;
+
+        // Route ke method yang sesuai
+        if ($db_status == 'rejected') {
+            return $this->get_ditolak();
+        } elseif ($db_status == 'pending') {
+            return $this->get_menunggu();
+        } elseif ($db_status == 'berkunjung') {
+            return $this->get_sedang_berkunjung();
+        } elseif ($db_status == 'selesai') {
+            return $this->get_telah_berkunjung();
+        } elseif ($db_status == 'approved') {
+            return $this->get_approved();
+        } else {
+            return $this->get_all();
+        }
     }
 
     // ========================================
@@ -154,7 +338,7 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Hitung pengunjung yang sedang berkunjung (DARI MAIN)
+     * FIXED: Hitung yang SEDANG berkunjung (check_in ada, check_out kosong)
      */
     public function get_count_sedang_berkunjung()
     {
@@ -164,7 +348,7 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Hitung pengunjung yang telah berkunjung (DARI MAIN)
+     * FIXED: Hitung yang TELAH berkunjung (sudah check_out)
      */
     public function get_count_telah_berkunjung()
     {
@@ -173,12 +357,13 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Hitung pengunjung hari ini
+     * FIXED: Hitung pengunjung hari ini yang APPROVED
      */
     public function count_today_visitors()
     {
         $today = date('Y-m-d');
         $this->db->where('DATE(scheduled_date)', $today);
+        $this->db->where('status', 'approved');
         return $this->db->count_all_results('visits');
     }
 
@@ -233,8 +418,7 @@ class Manajemen_model extends CI_Model
     public function check_in($visit_id)
     {
         $data = [
-            'check_in' => date('Y-m-d H:i:s'),
-            'status' => 'approved'
+            'check_in' => date('Y-m-d H:i:s')
         ];
         $this->db->where('visit_id', $visit_id);
         return $this->db->update('visits', $data);
@@ -246,8 +430,7 @@ class Manajemen_model extends CI_Model
     public function check_out($visit_id)
     {
         $data = [
-            'check_out' => date('Y-m-d H:i:s'),
-            'status' => 'completed'
+            'check_out' => date('Y-m-d H:i:s')
         ];
         $this->db->where('visit_id', $visit_id);
         return $this->db->update('visits', $data);
@@ -259,7 +442,6 @@ class Manajemen_model extends CI_Model
     
     /**
      * Search kunjungan
-     * GABUNGAN: Join dari MAIN + search logic dari TIA
      */
     public function search($keyword = null)
     {
@@ -289,11 +471,17 @@ class Manajemen_model extends CI_Model
         }
         
         $this->db->order_by('visits.scheduled_date', 'DESC');
-        return $this->db->get()->result_array();
+        $data = $this->db->get()->result_array();
+        
+        foreach ($data as &$row) {
+            $row['status_label'] = $this->get_status_label($row);
+        }
+        
+        return $data;
     }
 
     /**
-     * Hapus data pengunjung (DARI MAIN)
+     * Hapus data pengunjung
      */
     public function delete_visitor($id)
     {
@@ -302,7 +490,7 @@ class Manajemen_model extends CI_Model
     }
 
     /**
-     * Ambil semua data visits (DARI MAIN)
+     * Ambil semua data visits
      */
     public function get_all_visits()
     {

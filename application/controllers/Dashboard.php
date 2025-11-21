@@ -1,4 +1,8 @@
 <?php
+// ===================================================================
+// FILE 1: Dashboard.php
+// Location: application/controllers/Dashboard.php
+// ===================================================================
 defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
@@ -25,7 +29,7 @@ class Dashboard extends CI_Controller
 
     /**
      * Halaman dashboard resepsionis
-     * GABUNGAN: Load data count dari MAIN + structure dari TIA
+     * FIXED: Count sesuai dengan requirement
      */
     public function index()
     {
@@ -37,42 +41,39 @@ class Dashboard extends CI_Controller
         // 🔥 AMBIL DATA COUNT UNTUK CARD DASHBOARD
         // ========================================
         
-        // Card 1: Permohonan Ditolak
+        // Card 1: Permohonan Ditolak (status = rejected)
         $data['count_ditolak'] = $this->Manajemen_model->count_by_status('rejected');
-        $data['total_ditolak'] = $data['count_ditolak']; // Untuk kompatibilitas view
+        $data['total_ditolak'] = $data['count_ditolak'];
         
-        // Card 2: Sedang Berkunjung (sudah check_in tapi belum check_out)
+        // Card 2: Sedang Berkunjung (check_in ada, check_out kosong)
         $data['count_berkunjung'] = $this->Manajemen_model->get_count_sedang_berkunjung();
-        $data['total_berkunjung'] = $data['count_berkunjung']; // Untuk kompatibilitas view
+        $data['total_berkunjung'] = $data['count_berkunjung'];
         
-        // Card 3: Menunggu Approval
+        // Card 3: Menunggu Approval (status = pending)
         $data['count_menunggu'] = $this->Manajemen_model->count_by_status('pending');
-        $data['total_menunggu'] = $data['count_menunggu']; // Untuk kompatibilitas view
+        $data['total_menunggu'] = $data['count_menunggu'];
         
-        // Card 4: Telah Berkunjung (sudah checkout)
+        // Card 4: Telah Berkunjung (check_out ada)
         $data['count_selesai'] = $this->Manajemen_model->get_count_telah_berkunjung();
-        $data['total_selesai'] = $data['count_selesai']; // Untuk kompatibilitas view
+        $data['total_selesai'] = $data['count_selesai'];
         
-        // Card 5: Pengunjung Hari Ini
-        $data['count_today'] = count($this->Manajemen_model->get_today_visitors());
-        $data['total_today'] = $data['count_today']; // Untuk kompatibilitas view
+        // Card 5: Pengunjung Hari Ini (tanggal hari ini + status approved)
+        $data['count_today'] = $this->Manajemen_model->count_today_visitors();
+        $data['total_today'] = $data['count_today'];
         
-        // Card 6: Approved (semua yang statusnya approved)
+        // Card 6: Approved (status = approved)
         $data['count_approved'] = $this->Manajemen_model->count_by_status('approved');
-        $data['total_approved'] = $data['count_approved']; // Untuk kompatibilitas view
+        $data['total_approved'] = $data['count_approved'];
         
         // ========================================
         // 🔥 LOAD VIEW
         // ========================================
         
-        // Load sidebar dan dashboard
-        $this->load->view('Layouts/sidebar_admin', $data);
         $this->load->view('admin/dashboard', $data);
     }
 
     /**
      * Halaman detail pengunjung hari ini
-     * FITUR DARI BRANCH MAIN
      */
     public function pengunjung_hari_ini()
     {
@@ -90,4 +91,3 @@ class Dashboard extends CI_Controller
         $this->load->view('templates/footer');
     }
 }
-?>

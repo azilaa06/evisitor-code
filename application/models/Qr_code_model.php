@@ -4,21 +4,48 @@
 class Qr_code_model extends CI_Model {
     
     /**
-     * ✅ FIXED: Generate QR Code sesuai struktur database Anda
+     * ✅ SELECT HANYA kolom yang ADA di database dan DIPERLUKAN untuk QR Code view
+     * Tabel visitors: visitor_id, username, email (TIDAK ADA fullname, foto)
+     * Tabel visits: semua data lengkap visitor
+     * Tabel users: fullname untuk approver
+     */
+    private function selectVisitColumns() {
+        return 'v.visit_id, v.visitor_id, v.fullname, v.id_number, v.phone, 
+                v.institution, v.purpose, v.to_whom, v.scheduled_date, 
+                v.check_in, v.check_out, v.status, v.qr_code, v.qr_token, 
+                v.approved_by, v.approved_at, v.created_at,
+                vt.username as visitor_username,
+                vt.email as visitor_email,
+                u.fullname as approved_by_name';
+    }
+    
+    /**
+     * Generate QR Code dan Token setelah visit di-approve
      */
     public function generateQRCode($visit_id) {
-        // Generate unique token
-        $qr_token = strtoupper(substr(md5(uniqid(rand(), true)), 0, 7));
+        // Generate unique token (64 character)
+        $qr_token = bin2hex(random_bytes(32));
         
-        // Update KEDUA kolom: qr_token DAN qr_code
+        // QR Code data dalam format JSON
+        $qr_data = json_encode([
+            'visit_id' => $visit_id,
+            'token' => $qr_token,
+            'timestamp' => time()
+        ]);
+        
+        // Encode QR data
+        $qr_code = base64_encode($qr_data);
+        
+        // Update database dengan kedua kolom
         $this->db->where('visit_id', $visit_id);
         $update = $this->db->update('visits', [
-            'qr_token' => $qr_token,
-            'qr_code' => $qr_token
+            'qr_code' => $qr_code,
+            'qr_token' => $qr_token
         ]);
         
         return $update ? [
             'success' => true,
+            'qr_code' => $qr_code,
             'qr_token' => $qr_token
         ] : [
             'success' => false
@@ -26,8 +53,7 @@ class Qr_code_model extends CI_Model {
     }
 
     /**
-     * ✅ FIXED: Validasi QR Token sesuai enum status Anda
-     * Enum: 'pending','approved','rejected','completed','checked_in','checked_out','cancelled','no_show'
+     * Validate QR Token untuk check-in
      */
     public function validateQRToken($qr_token) {
         $qr_token = trim($qr_token);
@@ -39,17 +65,11 @@ class Qr_code_model extends CI_Model {
             ];
         }
 
-        // Query dengan kolom yang sesuai
-        $this->db->select('v.*, 
-            vt.username as visitor_username,
-            vt.fullname as visitor_fullname,
-            vt.email as visitor_email,
-            u.fullname as approved_by_name');
+        $this->db->select($this->selectVisitColumns());
         $this->db->from('visits v');
         $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
         $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
         
-        // Cari di qr_token ATAU qr_code
         $this->db->group_start();
         $this->db->where('v.qr_token', $qr_token);
         $this->db->or_where('v.qr_code', $qr_token);
@@ -60,14 +80,12 @@ class Qr_code_model extends CI_Model {
         if (!$visit) {
             return [
                 'success' => false,
-                'message' => 'QR Code tidak ditemukan. Pastikan kunjungan sudah disetujui.'
+                'message' => 'QR Code tidak valid atau kunjungan belum disetujui'
             ];
         }
 
-        // Cek status (sesuai enum database Anda)
         $status = strtolower(trim($visit->status));
         
-        // Hanya 'approved' yang boleh check-in
         if ($status !== 'approved') {
             $status_messages = [
                 'pending' => 'Kunjungan masih menunggu persetujuan',
@@ -90,8 +108,7 @@ class Qr_code_model extends CI_Model {
             ];
         }
         
-        // Cek apakah sudah check-in
-        if (!empty($visit->check_in)) {
+        if (!empty($visit->check_in) && $visit->check_in !== null) {
             return [
                 'success' => false,
                 'message' => 'Visitor sudah melakukan check-in pada ' . date('d/m/Y H:i', strtotime($visit->check_in)),
@@ -99,7 +116,6 @@ class Qr_code_model extends CI_Model {
             ];
         }
         
-        // Valid - bisa check-in
         return [
             'success' => true,
             'visit' => $visit
@@ -107,7 +123,7 @@ class Qr_code_model extends CI_Model {
     }
 
     /**
-     * ✅ FIXED: Process Check-In
+     * Process Check-In
      */
     public function processCheckIn($qr_token) {
         $validation = $this->validateQRToken($qr_token);
@@ -118,7 +134,6 @@ class Qr_code_model extends CI_Model {
         
         $visit = $validation['visit'];
         
-        // Update check-in time dan status ke 'checked_in'
         $this->db->where('visit_id', $visit->visit_id);
         $update = $this->db->update('visits', [
             'check_in' => date('Y-m-d H:i:s'),
@@ -126,12 +141,7 @@ class Qr_code_model extends CI_Model {
         ]);
         
         if ($update) {
-            // Ambil data terbaru
-            $this->db->select('v.*, 
-                vt.username as visitor_username,
-                vt.fullname as visitor_fullname, 
-                vt.email as visitor_email,
-                u.fullname as approved_by_name');
+            $this->db->select($this->selectVisitColumns());
             $this->db->from('visits v');
             $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
             $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
@@ -144,7 +154,7 @@ class Qr_code_model extends CI_Model {
             }
             
             $visitor_name = !empty($updated_visit->fullname) ? $updated_visit->fullname : 
-                           (!empty($updated_visit->visitor_fullname) ? $updated_visit->visitor_fullname : 'Visitor');
+                           (!empty($updated_visit->visitor_username) ? $updated_visit->visitor_username : 'Visitor');
             
             return [
                 'success' => true,
@@ -160,12 +170,13 @@ class Qr_code_model extends CI_Model {
     }
 
     /**
-     * ✅ FIXED: Process Check-Out
+     * Process Check-Out
      */
     public function processCheckOut($visit_id) {
-        $this->db->select('v.*, vt.username as visitor_username, vt.fullname as visitor_fullname');
+        $this->db->select($this->selectVisitColumns());
         $this->db->from('visits v');
         $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
+        $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
         $this->db->where('v.visit_id', $visit_id);
         $this->db->where('v.status', 'checked_in');
         
@@ -185,7 +196,6 @@ class Qr_code_model extends CI_Model {
             ];
         }
         
-        // Update check-out time dan status ke 'checked_out'
         $this->db->where('visit_id', $visit_id);
         $update = $this->db->update('visits', [
             'check_out' => date('Y-m-d H:i:s'),
@@ -193,9 +203,10 @@ class Qr_code_model extends CI_Model {
         ]);
         
         if ($update) {
-            $this->db->select('v.*, vt.username as visitor_username, vt.fullname as visitor_fullname');
+            $this->db->select($this->selectVisitColumns());
             $this->db->from('visits v');
             $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
+            $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
             $this->db->where('v.visit_id', $visit_id);
             
             $updated_visit = $this->db->get()->row();
@@ -214,14 +225,10 @@ class Qr_code_model extends CI_Model {
     }
 
     /**
-     * Get visit by token
+     * Get visit detail by QR token
      */
     public function getVisitByToken($qr_token) {
-        $this->db->select('v.*, 
-            vt.username as visitor_username,
-            vt.fullname as visitor_fullname, 
-            vt.email as visitor_email, 
-            u.fullname as approved_by_name');
+        $this->db->select($this->selectVisitColumns());
         $this->db->from('visits v');
         $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
         $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
@@ -235,14 +242,10 @@ class Qr_code_model extends CI_Model {
     }
 
     /**
-     * Get visit by ID
+     * Get visit detail by visit_id
      */
     public function getVisitById($visit_id) {
-        $this->db->select('v.*, 
-            vt.username as visitor_username,
-            vt.fullname as visitor_fullname, 
-            vt.email as visitor_email, 
-            u.fullname as approved_by_name');
+        $this->db->select($this->selectVisitColumns());
         $this->db->from('visits v');
         $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
         $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
@@ -250,6 +253,7 @@ class Qr_code_model extends CI_Model {
         
         $result = $this->db->get()->row();
         
+        // Konversi ke array untuk konsistensi dengan controller lain
         if ($result) {
             return (array) $result;
         }
@@ -258,32 +262,25 @@ class Qr_code_model extends CI_Model {
     }
 
     /**
-     * Get active visits (status = 'checked_in')
+     * Get active visits (checked-in but not checked-out yet)
      */
     public function getActiveVisits() {
-        $this->db->select('v.*, 
-            vt.username as visitor_username,
-            vt.fullname as visitor_fullname, 
-            vt.email as visitor_email,
-            u.fullname as approved_by_name');
+        $this->db->select($this->selectVisitColumns());
         $this->db->from('visits v');
         $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
         $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
         $this->db->where('v.status', 'checked_in');
+        $this->db->where('v.check_out IS NULL', null, false);
         $this->db->order_by('v.check_in', 'DESC');
         
         return $this->db->get()->result();
     }
 
     /**
-     * Get all visits dengan QR Code
+     * Get all visits with QR Code
      */
     public function getAllVisitsWithQR() {
-        $this->db->select('v.*, 
-            vt.username as visitor_username,
-            vt.fullname as visitor_fullname, 
-            vt.email as visitor_email, 
-            u.fullname as approved_by_name');
+        $this->db->select($this->selectVisitColumns());
         $this->db->from('visits v');
         $this->db->join('visitors vt', 'v.visitor_id = vt.visitor_id', 'left');
         $this->db->join('users u', 'v.approved_by = u.user_id', 'left');
@@ -294,24 +291,21 @@ class Qr_code_model extends CI_Model {
     }
 
     /**
-     * Get statistics
+     * Get statistics untuk dashboard
      */
     public function getCheckInStatistics($date = null) {
         if (!$date) {
             $date = date('Y-m-d');
         }
 
-        // Total check-in hari ini
         $this->db->where('DATE(check_in)', $date);
         $this->db->where_in('status', ['checked_in', 'checked_out', 'completed']);
         $total_checkin = $this->db->count_all_results('visits');
 
-        // Masih aktif (checked_in, belum checkout)
         $this->db->where('DATE(check_in)', $date);
         $this->db->where('status', 'checked_in');
         $active = $this->db->count_all_results('visits');
 
-        // Sudah checkout
         $this->db->where('DATE(check_in)', $date);
         $this->db->where_in('status', ['checked_out', 'completed']);
         $completed = $this->db->count_all_results('visits');
