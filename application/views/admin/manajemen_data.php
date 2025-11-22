@@ -225,29 +225,65 @@
             text-transform: capitalize;
         }
 
+        /* Pending - Orange */
         .status-badge.pending {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             color: #92400e;
         }
 
-        .status-badge.approve {
+        /* Approved / Disetujui - Green */
+        .status-badge.approve,
+        .status-badge.approved {
             background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
             color: #065f46;
         }
 
-        .status-badge.reject {
+        /* Rejected / Ditolak - Red */
+        .status-badge.reject,
+        .status-badge.rejected {
             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
             color: #991b1b;
         }
 
-        .status-badge.berkunjung {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            color: #1e40af;
-        }
-
+        /* Completed / Selesai - Blue */
+        .status-badge.completed,
         .status-badge.selesai {
             background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
             color: #4338ca;
+        }
+
+        /* Checked In - Purple Light */
+        .status-badge.checked_in,
+        .status-badge.check-in {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            color: #6d28d9;
+        }
+
+        /* Checked Out - Teal Light */
+        .status-badge.checked_out,
+        .status-badge.check-out {
+            background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+            color: #115e59;
+        }
+
+        /* Cancelled - Orange Dark */
+        .status-badge.cancelled,
+        .status-badge.dibatalkan {
+            background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+            color: #9a3412;
+        }
+
+        /* No Show - Gray */
+        .status-badge.no_show,
+        .status-badge.tidak-hadir {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: #475569;
+        }
+
+        /* Berkunjung - Cyan Light (alias untuk approved) */
+        .status-badge.berkunjung {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
         }
 
         /* Action Button Modern */
@@ -496,26 +532,48 @@
                                         <?php
                                         $status_class = '';
                                         $status_text = '';
-                                        switch ($row['status']) {
+                                        
+                                        // Normalisasi status
+                                        $current_status = strtolower(trim($row['status']));
+                                        
+                                        switch ($current_status) {
                                             case 'pending':
                                                 $status_class = 'pending';
                                                 $status_text = 'Menunggu';
                                                 break;
                                             case 'approved':
-                                                $status_class = 'berkunjung';
-                                                $status_text = 'Berkunjung';
+                                                $status_class = 'approved';
+                                                $status_text = 'Disetujui';
                                                 break;
                                             case 'rejected':
-                                                $status_class = 'reject';
+                                                $status_class = 'rejected';
                                                 $status_text = 'Ditolak';
                                                 break;
                                             case 'completed':
-                                                $status_class = 'selesai';
+                                                $status_class = 'completed';
                                                 $status_text = 'Selesai';
+                                                break;
+                                            case 'checked_in':
+                                            case 'check_in':
+                                                $status_class = 'checked_in';
+                                                $status_text = 'Check In';
+                                                break;
+                                            case 'checked_out':
+                                            case 'check_out':
+                                                $status_class = 'checked_out';
+                                                $status_text = 'Check Out';
+                                                break;
+                                            case 'cancelled':
+                                                $status_class = 'cancelled';
+                                                $status_text = 'Dibatalkan';
+                                                break;
+                                            case 'no_show':
+                                                $status_class = 'no_show';
+                                                $status_text = 'Tidak Hadir';
                                                 break;
                                             default:
                                                 $status_class = 'pending';
-                                                $status_text = ucfirst($row['status']);
+                                                $status_text = ucfirst($current_status);
                                         }
                                         ?>
                                         <span class="status-badge <?= $status_class; ?>">

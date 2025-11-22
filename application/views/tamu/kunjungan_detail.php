@@ -23,23 +23,23 @@
                 
                 if ($status == 'approved'): 
                 ?>
-                    <span style="color:white; background:linear-gradient(135deg, #10b981 0%, #059669 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(16,185,129,0.5), 0 0 30px rgba(16,185,129,0.3);">✔ Disetujui</span>
+                    <span style="background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color:#065f46; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Disetujui</span>
                 <?php elseif ($status == 'rejected'): ?>
-                    <span style="color:white; background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(239,68,68,0.5), 0 0 30px rgba(239,68,68,0.3);">✖ Ditolak</span>
+                    <span style="background:linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color:#991b1b; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Ditolak</span>
                 <?php elseif ($status == 'completed'): ?>
-                    <span style="color:white; background:linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(6,182,212,0.5), 0 0 30px rgba(6,182,212,0.3);">✓ Selesai</span>
+                    <span style="background:linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); color:#4338ca; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Selesai</span>
                 <?php elseif ($status == 'pending'): ?>
-                    <span style="color:white; background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(245,158,11,0.5), 0 0 30px rgba(245,158,11,0.3);">⏳ Pending</span>
+                    <span style="background:linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color:#92400e; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Pending</span>
                 <?php elseif ($status == 'checked_in'): ?>
-                    <span style="color:white; background:linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(139,92,246,0.5), 0 0 30px rgba(139,92,246,0.3);">📍 Check In</span>
+                    <span style="background:linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); color:#6d28d9; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Check In</span>
                 <?php elseif ($status == 'checked_out'): ?>
-                    <span style="color:white; background:linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(20,184,166,0.5), 0 0 30px rgba(20,184,166,0.3);">✓ Check Out</span>
+                    <span style="background:linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%); color:#115e59; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Check Out</span>
                 <?php elseif ($status == 'cancelled'): ?>
-                    <span style="color:white; background:linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(249,115,22,0.5), 0 0 30px rgba(249,115,22,0.3);">🚫 Dibatalkan</span>
+                    <span style="background:linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); color:#9a3412; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Dibatalkan</span>
                 <?php elseif ($status == 'no_show'): ?>
-                    <span style="color:white; background:linear-gradient(135deg, #64748b 0%, #475569 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(100,116,139,0.5), 0 0 30px rgba(100,116,139,0.3);">⊗ Tidak Hadir</span>
+                    <span style="background:linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color:#475569; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;">Tidak Hadir</span>
                 <?php else: ?>
-                    <span style="color:white; background:linear-gradient(135deg, #6b7280 0%, #4b5563 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(107,114,128,0.4);">? <?= ucfirst($status) ?></span>
+                    <span style="background:linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); color:#475569; padding:6px 14px; border-radius:20px; font-weight:600; font-size:12px; display:inline-block; min-width:90px; text-align:center;"><?= ucfirst($status) ?></span>
                 <?php endif; ?>
             </p>
             <p><strong>Penanggung Jawab :</strong> <?= htmlspecialchars($visit['penanggung_jawab'] ?? '-') ?></p>
