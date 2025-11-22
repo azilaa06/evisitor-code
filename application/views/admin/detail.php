@@ -107,12 +107,41 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            background: rgba(59, 130, 246, 0.3);
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 500;
-            border: 1px solid rgba(59, 130, 246, 0.5);
+            border: 1px solid;
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.5);
+            color: #f59e0b;
+        }
+
+        .status-badge.approved {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+            color: #3b82f6;
+        }
+
+        .status-badge.rejected {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+        }
+
+        .status-badge.checked_in {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #10b981;
+        }
+
+        .status-badge.checked_out {
+            background: rgba(100, 116, 139, 0.2);
+            border-color: rgba(100, 116, 139, 0.5);
+            color: #64748b;
         }
 
         .card-body {
@@ -276,8 +305,15 @@
 
         .modal-icon {
             font-size: 32px;
-            color: var(--primary);
             margin-bottom: 12px;
+        }
+
+        .modal-icon.delete {
+            color: var(--danger);
+        }
+
+        .modal-icon.checkout {
+            color: var(--primary);
         }
 
         .modal-title {
@@ -328,6 +364,14 @@
         .modal-btn-confirm:hover {
             transform: translateY(-1px);
             box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .modal-btn-confirm.delete {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+
+        .modal-btn-confirm.delete:hover {
+            box-shadow: 0 3px 8px rgba(239, 68, 68, 0.3);
         }
 
         /* Responsive Design */
@@ -436,9 +480,13 @@
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                         <h1 class="card-title">Detail Kunjungan</h1>
-                        <div class="status-badge">
-                            <i class="fas fa-clock"></i>
-                            <?= isset($pengunjung['status']) ? ucfirst($pengunjung['status']) : 'Pending' ?>
+                        <?php 
+                            $status = isset($pengunjung['status']) ? $pengunjung['status'] : 'pending';
+                            $status_class = str_replace('_', ' ', $status);
+                        ?>
+                        <div class="status-badge <?= $status ?>">
+                            <i class="fas <?= $status === 'pending' ? 'fa-clock' : ($status === 'approved' ? 'fa-check-circle' : ($status === 'rejected' ? 'fa-times-circle' : ($status === 'checked_in' ? 'fa-door-open' : 'fa-door-closed'))) ?>"></i>
+                            <?= ucwords($status_class) ?>
                         </div>
                     </div>
                 </div>
@@ -506,26 +554,46 @@
                         </div>
 
                         <div class="action-section">
-                            <?php if (isset($pengunjung['status']) && $pengunjung['status'] === 'pending') : ?>
+                            <?php 
+                            $status = isset($pengunjung['status']) ? $pengunjung['status'] : 'pending';
+                            
+                            // Tombol untuk status PENDING
+                            if ($status === 'pending') : ?>
                                 <button type="submit" name="status" value="approved" class="btn btn-approve">
                                     <i class="fas fa-check-circle"></i> Approve
                                 </button>
                                 <button type="submit" name="status" value="rejected" class="btn btn-reject">
                                     <i class="fas fa-times-circle"></i> Reject
                                 </button>
+                                <a href="<?= base_url('index.php/detail_kunjungan/delete/' . (isset($pengunjung['visit_id']) ? $pengunjung['visit_id'] : '')); ?>"
+                                    class="btn btn-hapus"
+                                    id="btnHapus">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </a>
                             <?php endif; ?>
 
-                            <a href="<?= base_url('index.php/detail_kunjungan/delete/' . (isset($pengunjung['visit_id']) ? $pengunjung['visit_id'] : '')); ?>"
-                                class="btn btn-hapus"
-                                id="btnHapus">
-                                <i class="fas fa-trash"></i> Hapus
-                            </a>
-
-                            <?php if (isset($pengunjung['status']) && ($pengunjung['status'] === 'pending' || $pengunjung['status'] === 'approved')) : ?>
+                            <?php 
+                            // Tombol untuk status CHECKED_IN
+                            if ($status === 'checked_in') : ?>
                                 <a href="<?= base_url('index.php/detail_kunjungan/checkout/' . (isset($pengunjung['visit_id']) ? $pengunjung['visit_id'] : '')); ?>"
                                     class="btn btn-checkout"
                                     id="btnCheckout">
                                     <i class="fas fa-sign-out-alt"></i> Check-Out
+                                </a>
+                                <a href="<?= base_url('index.php/detail_kunjungan/delete/' . (isset($pengunjung['visit_id']) ? $pengunjung['visit_id'] : '')); ?>"
+                                    class="btn btn-hapus"
+                                    id="btnHapus">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </a>
+                            <?php endif; ?>
+
+                            <?php 
+                            // Tombol untuk status CHECKED_OUT atau REJECTED
+                            if ($status === 'checked_out' || $status === 'rejected') : ?>
+                                <a href="<?= base_url('index.php/detail_kunjungan/delete/' . (isset($pengunjung['visit_id']) ? $pengunjung['visit_id'] : '')); ?>"
+                                    class="btn btn-hapus"
+                                    id="btnHapus">
+                                    <i class="fas fa-trash"></i> Hapus
                                 </a>
                             <?php endif; ?>
                         </div>
@@ -538,14 +606,14 @@
     <!-- Modal Konfirmasi Hapus -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-content">
-            <div class="modal-icon">
+            <div class="modal-icon delete">
                 <i class="fas fa-trash"></i>
             </div>
             <h3 class="modal-title">Konfirmasi Hapus</h3>
-            <p class="modal-message">Yakin ingin menghapus data kunjungan ini?</p>
+            <p class="modal-message">Yakin ingin menghapus data kunjungan ini? Data yang sudah dihapus tidak dapat dikembalikan.</p>
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-cancel" id="cancelDelete">Batal</button>
-                <button class="modal-btn modal-btn-confirm" id="confirmDelete">Ya, Hapus</button>
+                <button class="modal-btn modal-btn-confirm delete" id="confirmDelete">Ya, Hapus</button>
             </div>
         </div>
     </div>
@@ -553,11 +621,11 @@
     <!-- Modal Konfirmasi Check-Out -->
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal-content">
-            <div class="modal-icon">
+            <div class="modal-icon checkout">
                 <i class="fas fa-sign-out-alt"></i>
             </div>
             <h3 class="modal-title">Konfirmasi Check-Out</h3>
-            <p class="modal-message">Yakin ingin melakukan Check-Out untuk tamu ini?</p>
+            <p class="modal-message">Yakin ingin melakukan Check-Out untuk pengunjung ini? Status akan berubah menjadi "Checked Out".</p>
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-cancel" id="cancelCheckout">Batal</button>
                 <button class="modal-btn modal-btn-confirm" id="confirmCheckout">Ya, Check-Out</button>

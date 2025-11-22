@@ -403,6 +403,37 @@
             margin: 10px 0;
         }
 
+        /* Scan QR Button - FIXED POSITION */
+.scan-qr-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: #ffffff;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.scan-qr-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+.scan-qr-button i {
+    font-size: 18px;
+}
+
         #preview {
             width: 100%;
             height: 300px;

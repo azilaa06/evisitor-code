@@ -54,7 +54,14 @@
 
                     // Format tanggal kunjungan dari scheduled_date
                     $tanggal_kunjungan = date('d M Y', strtotime($row->scheduled_date));
-                    $waktu_kunjungan = date('H:i', strtotime($row->scheduled_date));
+                    
+                    // Format waktu dari created_at (kapan form dibuat)
+                    if (!empty($row->created_at)) {
+                        $datetime_created = new DateTime($row->created_at);
+                        $waktu_display = $datetime_created->format('H:i');
+                    } else {
+                        $waktu_display = '00:00';
+                    }
                 ?>
                 <div class="visitor-card"
                      onclick="window.location.href='<?= base_url('kunjungan/status_kunjungan/' . $row->visit_id) ?>'">
@@ -70,7 +77,7 @@
                             </div>
                             <div class="info-row secondary">
                                 <i class="fas fa-clock"></i>
-                                <span><?= $tanggal_kunjungan ?> • <?= $waktu_kunjungan ?></span>
+                                <span><?= $tanggal_kunjungan ?> • <?= $waktu_display ?></span>
                             </div>
                         </div>
                     </div>

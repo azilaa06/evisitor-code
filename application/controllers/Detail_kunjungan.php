@@ -117,13 +117,13 @@ class Detail_kunjungan extends CI_Controller
             show_404();
         }
 
-        // Validasi: hanya bisa checkout jika status pending atau approved
-        if (!in_array($visit_data['status'], ['pending', 'approved'])) {
-            $this->session->set_flashdata('error', 'Kunjungan ini tidak bisa di-checkout!');
+        // Validasi: hanya bisa checkout jika status checked_in
+        if ($visit_data['status'] !== 'checked_in') {
+            $this->session->set_flashdata('error', 'Kunjungan ini tidak bisa di-checkout! Pastikan tamu sudah check-in terlebih dahulu.');
             redirect('index.php/detail_kunjungan/detail/' . $id);
         }
 
-        // Update status menjadi completed dan catat waktu checkout
+        // Update status menjadi checked_out dan catat waktu checkout
         $this->Kunjungan_model->check_out($id);
 
         // Set flash message
