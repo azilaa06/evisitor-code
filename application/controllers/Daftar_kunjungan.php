@@ -38,10 +38,10 @@ class Daftar_kunjungan extends CI_Controller
         }
 
         $data['kunjungan'] = $this->Daftar_kunjungan_model->get_by_visitor($visitor_id);
-        $data['active_page'] = 'daftar_kunjungan'; // Tambahkan ini untuk efek sidebar aktif
+        $data['active_page'] = 'daftar_kunjungan';
 
         // Load tampilan daftar kunjungan
-        $this->load->view('Layouts/sidebar', $data); // Kirim $data agar active_page tersedia
+        $this->load->view('Layouts/sidebar', $data);
         $this->load->view('tamu/daftar_kunjungan', $data);
     }
 
@@ -50,6 +50,8 @@ class Daftar_kunjungan extends CI_Controller
      */
     public function detail($visit_id)
     {
+        $visitor_id = $this->session->userdata('visitor_id');
+        
         // Ambil detail kunjungan dan ubah key jadi 'visit' agar sesuai dengan view
         $kunjungan = $this->Daftar_kunjungan_model->get_detail($visit_id);
 
@@ -57,12 +59,19 @@ class Daftar_kunjungan extends CI_Controller
             show_404();
         }
 
+        // Validasi kepemilikan - pastikan kunjungan ini milik visitor yang login
+        if ($kunjungan['visitor_id'] != $visitor_id) {
+            $this->session->set_flashdata('error', 'Akses ditolak.');
+            redirect('daftar_kunjungan');
+            return;
+        }
+
         // Kirim dengan key 'visit' agar sesuai dengan view yang sudah ada
         $data['visit'] = $kunjungan;
-        $data['active_page'] = 'daftar_kunjungan'; // Tambahkan ini untuk efek sidebar aktif
+        $data['active_page'] = 'daftar_kunjungan';
 
         // Load sidebar dan halaman detail
-        $this->load->view('Layouts/sidebar', $data); // Kirim $data agar active_page tersedia
+        $this->load->view('Layouts/sidebar', $data);
         $this->load->view('tamu/kunjungan_detail', $data);
     }
 }

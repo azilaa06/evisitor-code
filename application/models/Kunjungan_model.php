@@ -80,7 +80,7 @@ class Kunjungan_model extends CI_Model
      * Dengan approved_by dan timestamp
      * 
      * @param int $visit_id ID kunjungan
-     * @param string $status Status baru (pending, approved, rejected, completed)
+     * @param string $status Status baru (pending, approved, rejected, checked_in, checked_out, completed, cancelled, no_show)
      * @param int|null $user_id ID user yang approve/reject
      * @return bool
      */
@@ -146,14 +146,14 @@ class Kunjungan_model extends CI_Model
     }
 
     /**
-     * 🆕 Ambil kunjungan dengan pagination
+     * 🆕 Ambil kunjungan dengan pagination - RETURN RESULT() untuk view
      * 
      * @param int $visitor_id ID visitor
      * @param int $limit Jumlah data per halaman
      * @param int $offset Offset data
-     * @return array
+     * @return object
      */
-    public function get_visits_by_visitor($visitor_id, $limit = 10, $offset = 0)
+    public function get_visits_by_visitor($visitor_id, $limit = 100, $offset = 0)
     {
         $this->db->select('v.*, v.visit_id as visit_id,
             COALESCE(u.fullname, "Belum ditentukan") as penanggung_jawab');
@@ -163,24 +163,28 @@ class Kunjungan_model extends CI_Model
         $this->db->order_by('v.created_at', 'DESC');
         $this->db->limit($limit, $offset);
         
-        return $this->db->get()->result_array();
+        return $this->db->get()->result(); // Return result() bukan result_array()
     }
 
     /**
      * 🆕 Ambil kunjungan berdasarkan status
      * 
-     * @param int $visitor_id ID visitor
-     * @param string $status Status (pending, approved, rejected, completed)
+     * @param string $status Status (pending, approved, rejected, checked_in, checked_out, completed, cancelled, no_show)
+     * @param int|null $visitor_id ID visitor (opsional untuk filter by visitor)
      * @return array
      */
-    public function get_visits_by_status($visitor_id, $status)
+    public function get_visits_by_status($status, $visitor_id = null)
     {
         $this->db->select('v.*, v.visit_id as visit_id,
             COALESCE(u.fullname, "Belum ditentukan") as penanggung_jawab');
         $this->db->from($this->table . ' v');
         $this->db->join($this->table_users . ' u', 'v.approved_by = u.user_id', 'left');
-        $this->db->where('v.visitor_id', $visitor_id);
         $this->db->where('v.status', $status);
+        
+        if ($visitor_id !== null) {
+            $this->db->where('v.visitor_id', $visitor_id);
+        }
+        
         $this->db->order_by('v.created_at', 'DESC');
         
         return $this->db->get()->result_array();
@@ -220,8 +224,8 @@ class Kunjungan_model extends CI_Model
     }
 
     /**
-     * 🆕 Update check-in timestamp
-     * Dipanggil saat QR di-scan untuk check-in
+     * 🔄 UPDATED: Check-in visitor (scan QR Code)
+     * Update status ke 'checked_in' dan simpan waktu check-in
      * 
      * @param int $visit_id ID kunjungan
      * @return bool
@@ -229,17 +233,18 @@ class Kunjungan_model extends CI_Model
     public function check_in($visit_id)
     {
         $data = [
-            'check_in_time' => date('Y-m-d H:i:s'),
-            'status' => 'completed'
+            'check_in' => date('Y-m-d H:i:s'),
+            'status' => 'checked_in'
         ];
         
         $this->db->where('visit_id', $visit_id);
+        $this->db->where('status', 'approved'); // Hanya bisa check-in jika status approved
         return $this->db->update($this->table, $data);
     }
 
     /**
-     * 🆕 Update check-out timestamp
-     * Dipanggil saat tamu check-out
+     * 🔄 UPDATED: Check-out visitor
+     * Update status ke 'checked_out' dan simpan waktu check-out
      * 
      * @param int $visit_id ID kunjungan
      * @return bool
@@ -247,16 +252,30 @@ class Kunjungan_model extends CI_Model
     public function check_out($visit_id)
     {
         $data = [
-            'check_out_time' => date('Y-m-d H:i:s'),
-            'status' => 'completed'
+            'check_out' => date('Y-m-d H:i:s'),
+            'status' => 'checked_out'
         ];
         
+        $this->db->where('visit_id', $visit_id);
+        $this->db->where('status', 'checked_in'); // Hanya bisa check-out jika sudah check-in
+        return $this->db->update($this->table, $data);
+    }
+
+    /**
+     * 🆕 Update general - untuk update field apapun
+     * 
+     * @param int $visit_id ID kunjungan
+     * @param array $data Data yang akan diupdate
+     * @return bool
+     */
+    public function update_visit($visit_id, $data)
+    {
         $this->db->where('visit_id', $visit_id);
         return $this->db->update($this->table, $data);
     }
 
     /**
-     * 🆕 Ambil statistik kunjungan visitor
+     * 🔄 UPDATED: Ambil statistik kunjungan visitor - SEMUA STATUS
      * 
      * @param int $visitor_id ID visitor
      * @return array
@@ -283,10 +302,30 @@ class Kunjungan_model extends CI_Model
         $this->db->where('status', 'rejected');
         $stats['rejected'] = $this->db->count_all_results($this->table);
         
+        // Checked In
+        $this->db->where('visitor_id', $visitor_id);
+        $this->db->where('status', 'checked_in');
+        $stats['checked_in'] = $this->db->count_all_results($this->table);
+        
+        // Checked Out
+        $this->db->where('visitor_id', $visitor_id);
+        $this->db->where('status', 'checked_out');
+        $stats['checked_out'] = $this->db->count_all_results($this->table);
+        
         // Completed
         $this->db->where('visitor_id', $visitor_id);
         $this->db->where('status', 'completed');
         $stats['completed'] = $this->db->count_all_results($this->table);
+        
+        // Cancelled
+        $this->db->where('visitor_id', $visitor_id);
+        $this->db->where('status', 'cancelled');
+        $stats['cancelled'] = $this->db->count_all_results($this->table);
+        
+        // No Show
+        $this->db->where('visitor_id', $visitor_id);
+        $this->db->where('status', 'no_show');
+        $stats['no_show'] = $this->db->count_all_results($this->table);
         
         return $stats;
     }
@@ -316,5 +355,90 @@ class Kunjungan_model extends CI_Model
         $this->db->order_by('v.created_at', 'DESC');
         
         return $this->db->get()->result_array();
+    }
+
+    /**
+     * 🆕 Batalkan kunjungan
+     * 
+     * @param int $visit_id ID kunjungan
+     * @param string|null $reason Alasan pembatalan
+     * @return bool
+     */
+    public function cancel_visit($visit_id, $reason = null)
+    {
+        $data = [
+            'status' => 'cancelled'
+        ];
+        
+        if ($reason) {
+            $data['rejection_reason'] = $reason;
+        }
+        
+        $this->db->where('visit_id', $visit_id);
+        return $this->db->update($this->table, $data);
+    }
+
+    /**
+     * 🆕 Tandai sebagai no show
+     * 
+     * @param int $visit_id ID kunjungan
+     * @return bool
+     */
+    public function mark_no_show($visit_id)
+    {
+        $data = [
+            'status' => 'no_show'
+        ];
+        
+        $this->db->where('visit_id', $visit_id);
+        return $this->db->update($this->table, $data);
+    }
+
+    /**
+     * 🆕 Ambil kunjungan hari ini berdasarkan status
+     * Untuk dashboard resepsionis
+     * 
+     * @param string|null $status Status filter (opsional)
+     * @return array
+     */
+    public function get_todays_visits($status = null)
+    {
+        $today = date('Y-m-d');
+        
+        $this->db->select('v.*, v.visit_id as visit_id,
+            COALESCE(u.fullname, "Belum ditentukan") as penanggung_jawab');
+        $this->db->from($this->table . ' v');
+        $this->db->join($this->table_users . ' u', 'v.approved_by = u.user_id', 'left');
+        $this->db->where('DATE(v.scheduled_date)', $today);
+        
+        if ($status) {
+            $this->db->where('v.status', $status);
+        }
+        
+        $this->db->order_by('v.scheduled_date', 'ASC');
+        
+        return $this->db->get()->result_array();
+    }
+
+    /**
+     * 🆕 Hitung pending visits untuk notifikasi
+     * 
+     * @return int
+     */
+    public function count_pending_visits()
+    {
+        $this->db->where('status', 'pending');
+        return $this->db->count_all_results($this->table);
+    }
+
+    /**
+     * 🆕 Hitung checked-in visits (visitor yang sedang berada di lokasi)
+     * 
+     * @return int
+     */
+    public function count_checked_in_visits()
+    {
+        $this->db->where('status', 'checked_in');
+        return $this->db->count_all_results($this->table);
     }
 }

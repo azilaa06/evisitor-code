@@ -37,11 +37,28 @@
 
     <!-- Logout -->
     <div class="logout">
-        <a href="<?= base_url('auth/logout'); ?>">
+        <a href="#" onclick="confirmLogout(event, '<?= base_url('auth/logout'); ?>')">
             <i class="fas fa-right-from-bracket"></i> Logout
         </a>
     </div>
 </nav>
+
+<!-- Modal Konfirmasi Logout -->
+<div id="logoutModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <i class="fas fa-sign-out-alt" style="font-size: 48px; color: #3b82f6; margin-bottom: 20px;"></i>
+        <h3 style="margin-bottom: 10px; color: #1e293b;">Konfirmasi Logout</h3>
+        <p style="color: #64748b; margin-bottom: 25px;">Apakah Anda yakin ingin keluar?</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button onclick="closeLogoutModal()" style="padding: 10px 24px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; color: #475569;">
+                Tidak
+            </button>
+            <button id="confirmLogoutBtn" style="padding: 10px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                Ya
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- Script Sidebar -->
 <script>
@@ -71,6 +88,31 @@
 
     window.addEventListener('resize', checkScreen);
     window.addEventListener('load', checkScreen);
+
+    // Fungsi Validasi Logout
+    let logoutUrl = '';
+
+    function confirmLogout(event, url) {
+        event.preventDefault();
+        logoutUrl = url;
+        const modal = document.getElementById('logoutModal');
+        modal.style.display = 'flex';
+    }
+
+    function closeLogoutModal() {
+        document.getElementById('logoutModal').style.display = 'none';
+    }
+
+    document.getElementById('confirmLogoutBtn').addEventListener('click', function() {
+        window.location.href = logoutUrl;
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('logoutModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeLogoutModal();
+        }
+    });
 </script>
 
 <!-- CSS Modern -->

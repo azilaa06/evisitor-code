@@ -101,7 +101,7 @@ class Kunjungan extends CI_Controller
         $data['active_page'] = 'daftar_kunjungan';
         $data['nama'] = $this->session->userdata('nama');
         $data['username'] = $this->session->userdata('username');
-        $data['visits'] = $this->Kunjungan_model->get_visits_by_visitor($visitor_id);
+        $data['kunjungan'] = $this->Kunjungan_model->get_visits_by_visitor($visitor_id);
 
         $this->load->view('Layouts/sidebar', $data);
         $this->load->view('tamu/daftar_kunjungan', $data);
@@ -172,11 +172,36 @@ class Kunjungan extends CI_Controller
             die('ERROR: Data kunjungan tidak ditemukan untuk ID: ' . $visit_id);
         }
 
-        // Check status
+        // Check status - UPDATED: tambah validasi untuk semua status yang tidak boleh download
         $status = strtolower(trim($visit['status'] ?? ''));
         
+        // Hanya status approved yang bisa download QR
         if ($status != 'approved') {
-            die('ERROR: Status bukan approved. Tidak bisa download QR Code.');
+            $status_msg = '';
+            switch($status) {
+                case 'pending':
+                    $status_msg = 'Kunjungan masih menunggu persetujuan. Tidak bisa download QR Code.';
+                    break;
+                case 'rejected':
+                    $status_msg = 'Kunjungan ditolak. Tidak bisa download QR Code.';
+                    break;
+                case 'checked_in':
+                    $status_msg = 'Anda sudah check-in. QR Code sudah digunakan.';
+                    break;
+                case 'checked_out':
+                case 'completed':
+                    $status_msg = 'Kunjungan sudah selesai. QR Code sudah tidak berlaku.';
+                    break;
+                case 'cancelled':
+                    $status_msg = 'Kunjungan dibatalkan. Tidak bisa download QR Code.';
+                    break;
+                case 'no_show':
+                    $status_msg = 'Kunjungan ditandai tidak hadir. Tidak bisa download QR Code.';
+                    break;
+                default:
+                    $status_msg = 'Status tidak valid untuk download QR Code.';
+            }
+            die('ERROR: ' . $status_msg);
         }
 
         // Check GD library

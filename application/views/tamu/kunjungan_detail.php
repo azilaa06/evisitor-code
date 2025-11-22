@@ -30,11 +30,28 @@
                     <span style="color:white; background:linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(6,182,212,0.5), 0 0 30px rgba(6,182,212,0.3);">✓ Selesai</span>
                 <?php elseif ($status == 'pending'): ?>
                     <span style="color:white; background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(245,158,11,0.5), 0 0 30px rgba(245,158,11,0.3);">⏳ Pending</span>
+                <?php elseif ($status == 'checked_in'): ?>
+                    <span style="color:white; background:linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(139,92,246,0.5), 0 0 30px rgba(139,92,246,0.3);">📍 Check In</span>
+                <?php elseif ($status == 'checked_out'): ?>
+                    <span style="color:white; background:linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(20,184,166,0.5), 0 0 30px rgba(20,184,166,0.3);">✓ Check Out</span>
+                <?php elseif ($status == 'cancelled'): ?>
+                    <span style="color:white; background:linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(249,115,22,0.5), 0 0 30px rgba(249,115,22,0.3);">🚫 Dibatalkan</span>
+                <?php elseif ($status == 'no_show'): ?>
+                    <span style="color:white; background:linear-gradient(135deg, #64748b 0%, #475569 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 20px rgba(100,116,139,0.5), 0 0 30px rgba(100,116,139,0.3);">⊗ Tidak Hadir</span>
                 <?php else: ?>
                     <span style="color:white; background:linear-gradient(135deg, #6b7280 0%, #4b5563 100%); padding:6px 14px; border-radius:8px; font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 4px 14px rgba(107,114,128,0.4);">? <?= ucfirst($status) ?></span>
                 <?php endif; ?>
             </p>
             <p><strong>Penanggung Jawab :</strong> <?= htmlspecialchars($visit['penanggung_jawab'] ?? '-') ?></p>
+            
+            <?php if ($status == 'checked_in' && !empty($visit['check_in'])): ?>
+            <p><strong>Waktu Check In :</strong> <?= date('d F Y, H:i', strtotime($visit['check_in'])) ?></p>
+            <?php endif; ?>
+            
+            <?php if ($status == 'checked_out' && !empty($visit['check_out'])): ?>
+            <p><strong>Waktu Check In :</strong> <?= date('d F Y, H:i', strtotime($visit['check_in'])) ?></p>
+            <p><strong>Waktu Check Out :</strong> <?= date('d F Y, H:i', strtotime($visit['check_out'])) ?></p>
+            <?php endif; ?>
         </div>
 
         <!-- QR Code Section -->
@@ -75,6 +92,54 @@
                     <div class="qr-content">
                         <h3>Kunjungan Ditolak</h3>
                         <p>Maaf, kunjungan Anda ditolak. Silakan hubungi admin untuk informasi lebih lanjut.</p>
+                    </div>
+                </div>
+            </div>
+        <?php elseif ($status == 'checked_in'): ?>
+            <div class="qr-section checked-in">
+                <div class="qr-card">
+                    <div class="qr-icon">
+                        <i class="fas fa-door-open"></i>
+                    </div>
+                    <div class="qr-content">
+                        <h3>Sudah Check In</h3>
+                        <p>Anda telah melakukan check-in. Menunggu proses check-out dari resepsionis.</p>
+                    </div>
+                </div>
+            </div>
+        <?php elseif ($status == 'checked_out' || $status == 'completed'): ?>
+            <div class="qr-section completed">
+                <div class="qr-card">
+                    <div class="qr-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="qr-content">
+                        <h3>Kunjungan Selesai</h3>
+                        <p>Terima kasih atas kunjungan Anda. Kunjungan telah selesai.</p>
+                    </div>
+                </div>
+            </div>
+        <?php elseif ($status == 'cancelled'): ?>
+            <div class="qr-section cancelled">
+                <div class="qr-card">
+                    <div class="qr-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div class="qr-content">
+                        <h3>Kunjungan Dibatalkan</h3>
+                        <p>Kunjungan ini telah dibatalkan.</p>
+                    </div>
+                </div>
+            </div>
+        <?php elseif ($status == 'no_show'): ?>
+            <div class="qr-section no-show">
+                <div class="qr-card">
+                    <div class="qr-icon">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <div class="qr-content">
+                        <h3>Tidak Hadir</h3>
+                        <p>Anda tidak hadir pada jadwal kunjungan yang telah ditentukan.</p>
                     </div>
                 </div>
             </div>
@@ -212,6 +277,26 @@ body {
     border-color: #fecaca;
 }
 
+.qr-section.checked-in {
+    background: #ede9fe;
+    border-color: #ddd6fe;
+}
+
+.qr-section.completed {
+    background: #d1fae5;
+    border-color: #a7f3d0;
+}
+
+.qr-section.cancelled {
+    background: #ffedd5;
+    border-color: #fed7aa;
+}
+
+.qr-section.no-show {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -246,6 +331,22 @@ body {
 
 .qr-section.rejected .qr-icon {
     background: #ef4444;
+}
+
+.qr-section.checked-in .qr-icon {
+    background: #8b5cf6;
+}
+
+.qr-section.completed .qr-icon {
+    background: #14b8a6;
+}
+
+.qr-section.cancelled .qr-icon {
+    background: #f97316;
+}
+
+.qr-section.no-show .qr-icon {
+    background: #64748b;
 }
 
 .qr-icon i {

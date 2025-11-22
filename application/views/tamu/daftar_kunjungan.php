@@ -15,7 +15,7 @@
                     $status_class = '';
                     $status_text = '';
                     
-                    // Mapping status sesuai database (pending, approved, rejected, completed)
+                    // Mapping status sesuai database
                     switch($row->status) {
                         case 'approved':
                             $status_class = 'status-disetujui';
@@ -28,6 +28,22 @@
                         case 'completed':
                             $status_class = 'status-completed';
                             $status_text = 'Selesai';
+                            break;
+                        case 'checked_in':
+                            $status_class = 'status-checked-in';
+                            $status_text = 'Check In';
+                            break;
+                        case 'checked_out':
+                            $status_class = 'status-checked-out';
+                            $status_text = 'Check Out';
+                            break;
+                        case 'cancelled':
+                            $status_class = 'status-cancelled';
+                            $status_text = 'Dibatalkan';
+                            break;
+                        case 'no_show':
+                            $status_class = 'status-no-show';
+                            $status_text = 'Tidak Hadir';
                             break;
                         case 'pending':
                         default:
@@ -224,6 +240,26 @@
     .status-pending {
         background: rgba(253, 224, 71, 0.3);
         color: #78350f;
+    }
+
+    .status-checked-in {
+        background: rgba(196, 181, 253, 0.3);
+        color: #5b21b6;
+    }
+
+    .status-checked-out {
+        background: rgba(153, 246, 228, 0.3);
+        color: #115e59;
+    }
+
+    .status-cancelled {
+        background: rgba(251, 146, 60, 0.2);
+        color: #9a3412;
+    }
+
+    .status-no-show {
+        background: rgba(148, 163, 184, 0.2);
+        color: #334155;
     }
 
     /* No Data */
